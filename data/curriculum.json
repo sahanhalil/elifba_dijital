@@ -1,0 +1,214 @@
+{
+  "project": "Dijital Elifba",
+  "version": "1.0.0",
+  "levels": [
+    {
+      "id": "island_1_harfler",
+      "title": "Harfler Dünyası",
+      "description": "28 Harfin temel okunuşları ve mahreçleri",
+      "items": [
+        {
+          "id": "elif",
+          "symbol": "ا",
+          "name": "Elif",
+          "mahraj_region": "Boğaz / Ağız Boşluğu",
+          "sound_type": "İnce",
+          "child_hint": "Ağzını rahatça aç ve 'Eee' de!",
+          "common_errors": {
+            "tr": "Genelde sorunsuz çıkarılır."
+          }
+        },
+        {
+          "id": "be",
+          "symbol": "ب",
+          "name": "Be",
+          "mahraj_region": "Dudak",
+          "sound_type": "İnce",
+          "child_hint": "İki dudağını hafifçe birbirine bastırıp patlat: 'Be'!",
+          "common_errors": {
+            "tr": "P sesine kaymaması gerekir."
+          }
+        },
+        {
+          "id": "te",
+          "symbol": "ت",
+          "name": "Te",
+          "mahraj_region": "Dil Ucu & Üst Diş Dipleri",
+          "sound_type": "İnce",
+          "child_hint": "Dilinin ucunu üst ön dişlerinin arkasına dokundur.",
+          "common_errors": {
+            "tr": "Tı gibi kalınlaştırılmamalıdır."
+          }
+        },
+        {
+          "id": "se",
+          "symbol": "ث",
+          "name": "Se (Peltek)",
+          "mahraj_region": "Dil Ucu & Üst Ön Dişler",
+          "sound_type": "İnce / Peltek",
+          "child_hint": "Dilinin ucunu dişlerinin arasından hafifçe dışarı çıkar ve tatlıca 'Se' de!",
+          "common_errors": {
+            "tr": "Keskin 'Sin (س)' gibi okunması en yaygın hatadır.",
+            "correction_message": "Dikkat! Dilini dişlerinin arasına alarak biraz peltek çıkarmayı dene."
+          }
+        },
+        {
+          "id": "cim",
+          "symbol": "ج",
+          "name": "Cim",
+          "mahraj_region": "Dil Ortası & Üst Damak",
+          "sound_type": "İnce / Tok",
+          "child_hint": "Dilinin ortasını damağına kuvvetlice yapıştır: 'Cim'!",
+          "common_errors": {
+            "tr": "Jandarma'nın J'si gibi gevşek bırakılmamalı, net C olmalı."
+          }
+        },
+        {
+          "id": "ha",
+          "symbol": "ح",
+          "name": "Ha (Boğaz)",
+          "mahraj_region": "Boğaz Ortası",
+          "sound_type": "İnce / Boğaz",
+          "child_hint": "Aynaya buğu yapıyormuş gibi veya boğazını tatlıca sıkıp ferahlatır gibi 'Ha' de!",
+          "common_errors": {
+            "tr": "Göğüsten gelen düz 'He (ه)' gibi okunması.",
+            "correction_message": "Harfi göğsünden değil, boğazını hafifçe sıkarak buğu yapar gibi çıkar."
+          }
+        },
+        {
+          "id": "hi",
+          "symbol": "خ",
+          "name": "Hı (Hırıltılı)",
+          "mahraj_region": "Boğazın Ağza Yakın Kısmı",
+          "sound_type": "Kalın / Hırıltılı",
+          "child_hint": "Boğazından hafifçe hırıldatarak tok bir 'Hı' sesi çıkar!",
+          "common_errors": {
+            "tr": "Düz H gibi okunması veya aşırı zorlanması."
+          }
+        },
+        {
+          "id": "sad",
+          "symbol": "ص",
+          "name": "Sad",
+          "mahraj_region": "Dil Ucu & Ön Dişler",
+          "sound_type": "Kalın / Islıklı",
+          "child_hint": "Ağzını doldurarak, yanaklarını hafif şişirip tok bir 'Sad' de!",
+          "common_errors": {
+            "tr": "İnce 'Sin (س)' harfiyle karıştırılması.",
+            "correction_message": "Harfi biraz daha dolgun ve kalın çıkarmalısın, 'Sin' gibi ince olmasın."
+          }
+        },
+        {
+          "id": "dad",
+          "symbol": "ض",
+          "name": "Dad (Zad)",
+          "mahraj_region": "Dil Yanı & Azı Dişleri",
+          "sound_type": "Kalın",
+          "child_hint": "Dilinin yan tarafını üst azı dişlerine yaslayarak kalınca çıkar.",
+          "common_errors": {
+            "tr": "Düz Türkçe Z veya D harfi gibi okunması."
+          }
+        },
+        {
+          "id": "ti",
+          "symbol": "ط",
+          "name": "Tı",
+          "mahraj_region": "Dil Ucu & Üst Diş Kökü",
+          "sound_type": "Kalın / Tok",
+          "child_hint": "Dilinin üstünü damağa doğru kabart, kocaman bir 'Tı' de!",
+          "common_errors": {
+            "tr": "İnce 'Te (ت)' ile karıştırılması."
+          }
+        },
+        {
+          "id": "ayin",
+          "symbol": "ع",
+          "name": "Ayın",
+          "mahraj_region": "Boğaz Ortası",
+          "sound_type": "Boğaz / Kalınlaşan",
+          "child_hint": "Boğazını hafifçe sıkıp sesini ortadan çıkar: 'Ayn'!",
+          "common_errors": {
+            "tr": "Düz Türkçe A veya Elif (Hemze) gibi okunması.",
+            "correction_message": "Sadece 'A' deme, boğazının ortasını hafifçe sıkarak derinleştir."
+          }
+        },
+        {
+          "id": "kaf",
+          "symbol": "ق",
+          "name": "Kaf",
+          "mahraj_region": "Dil Kökü & Küçük Dil",
+          "sound_type": "Kalın / Tok",
+          "child_hint": "Boğazının en gerisinden, küçük dilinin ordan 'Kaf' de!",
+          "common_errors": {
+            "tr": "İnce 'Kef (ك)' harfiyle karıştırılması."
+          }
+        }
+      ]
+    },
+    {
+      "id": "island_2_harekeler",
+      "title": "Sihirli Şapkalar Vadisi",
+      "description": "Üstün, Esre ve Ötre ile seslendirme",
+      "rules": [
+        {
+          "type": "ustun",
+          "symbol": " َ ",
+          "character_name": "Pervane Şapka",
+          "sound_rule": "İnce harflere 'E', kalın harflere 'A' sesi verir.",
+          "examples": [
+            { "text": "اَ", "transliteration": "E", "target_id": "elif_ustun" },
+            { "text": "بَ", "transliteration": "Be", "target_id": "be_ustun" },
+            { "text": "تَ", "transliteration": "Te", "target_id": "te_ustun" }
+          ]
+        },
+        {
+          "type": "esre",
+          "symbol": " ِ ",
+          "character_name": "Kaykay Tahtası",
+          "sound_rule": "İnce harflere 'İ', kalın harflere 'I' sesi verir.",
+          "examples": [
+            { "text": "اِ", "transliteration": "İ", "target_id": "elif_esre" },
+            { "text": "بِ", "transliteration": "Bi", "target_id": "be_esre" }
+          ]
+        },
+        {
+          "type": "otre",
+          "symbol": " ُ ",
+          "character_name": "Düdük Balon",
+          "sound_rule": "İnce harflere 'Ü', kalın harflere 'U' sesi verir.",
+          "examples": [
+            { "text": "اُ", "transliteration": "Ü", "target_id": "elif_otre" },
+            { "text": "بُ", "transliteration": "Bü", "target_id": "be_otre" }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "island_3_cezm_sedde",
+      "title": "Fren ve Kas Şatosu",
+      "description": "Cezm (Durma) ve Şedde (İki kere vurma)",
+      "rules": [
+        {
+          "type": "cezm",
+          "symbol": " ْ ",
+          "character_name": "Kırmızı Işık / El Freni",
+          "sound_rule": "Harfi aniden durdurur.",
+          "examples": [
+            { "text": "اَبْ", "transliteration": "Eb", "target_id": "eb_cezm" },
+            { "text": "اَتْ", "transliteration": "Et", "target_id": "et_cezm" }
+          ]
+        },
+        {
+          "type": "sedde",
+          "symbol": " ّ ",
+          "character_name": "Halterci Kardeş",
+          "sound_rule": "Harfe iki kere kuvvetlice bastırır.",
+          "examples": [
+            { "text": "اَبَّ", "transliteration": "Ebbe", "target_id": "ebbe_sedde" },
+            { "text": "اَتَّ", "transliteration": "Ette", "target_id": "ette_sedde" }
+          ]
+        }
+      ]
+    }
+  ]
+}

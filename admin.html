@@ -1,0 +1,588 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+  <meta charset="utf-8"/>
+  <meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+  <title>Elifba Kids — Müfredat ve İçerik Yönetim Paneli (Admin)</title>
+  
+  <!-- Fonts & Icons -->
+  <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200" rel="stylesheet"/>
+  <link href="https://fonts.googleapis.com" rel="preconnect"/>
+  <link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect"/>
+  <link href="https://fonts.googleapis.com/css2?family=Amiri:wght@400;700&family=Nunito+Sans:wght@500;600;700;800&family=Quicksand:wght@600;700&display=swap" rel="stylesheet"/>
+  
+  <script src="https://cdn.tailwindcss.com"></script>
+  <style>
+    body { font-family: 'Nunito Sans', sans-serif; }
+    .font-arabic { font-family: 'Amiri', serif; }
+    .font-title { font-family: 'Quicksand', sans-serif; }
+    
+    .key-btn {
+      transition: all 0.1s ease;
+      box-shadow: 0 3px 0 rgba(0,0,0,0.12);
+    }
+    .key-btn:active {
+      transform: translateY(2px);
+      box-shadow: 0 1px 0 rgba(0,0,0,0.12);
+    }
+  </style>
+</head>
+<body class="bg-slate-50 text-slate-800 min-h-screen flex flex-col">
+
+  <!-- Üst Bar -->
+  <header class="bg-white border-b border-slate-200 sticky top-0 z-40 shadow-xs">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 h-16 flex items-center justify-between">
+      <div class="flex items-center gap-3">
+        <span class="w-10 h-10 rounded-2xl bg-sky-500 text-white flex items-center justify-center font-bold text-xl shadow-xs">
+          ✍️
+        </span>
+        <div>
+          <h1 class="font-title font-bold text-lg text-slate-800 leading-tight">Elifba Kids — İçerik & Müfredat Paneli</h1>
+          <p class="text-xs text-slate-500">Kelimeleri, harekeleri ve heceleme animasyonlarını yönetin</p>
+        </div>
+      </div>
+
+      <div class="flex items-center gap-2">
+        <a href="http://localhost:8080" target="_blank" class="px-3.5 py-1.5 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-700 text-xs font-bold flex items-center gap-1.5 transition-colors">
+          <span class="material-symbols-outlined text-[16px]">visibility</span>
+          <span>Çocuk Uygulamasını Aç</span>
+        </a>
+        <button onclick="exportCurriculumJSON()" class="px-4 py-1.5 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-bold flex items-center gap-1.5 shadow-sm transition-colors">
+          <span class="material-symbols-outlined text-[16px]">download</span>
+          <span>Müfredatı İndir (JSON)</span>
+        </button>
+      </div>
+    </div>
+  </header>
+
+  <!-- Ana Panel Gövdesi -->
+  <main class="max-w-7xl mx-auto px-4 sm:px-6 py-6 grid grid-cols-1 lg:grid-cols-12 gap-6 flex-1 w-full">
+    
+    <!-- SOL KOLON: KLAVYE & FORM GİRİŞİ (7 Kolon) -->
+    <div class="lg:col-span-7 flex flex-col gap-5">
+      
+      <!-- Bölüm ve Kategori Seçimi -->
+      <div class="bg-white p-5 rounded-3xl border border-slate-200 shadow-xs">
+        <h2 class="font-title font-bold text-sm text-slate-700 mb-3 flex items-center gap-1.5">
+          <span class="material-symbols-outlined text-sky-600 text-[18px]">folder_open</span>
+          <span>1. Bölüm ve Hedef Seçimi</span>
+        </h2>
+        
+        <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+          <div>
+            <label class="block text-xs font-bold text-slate-500 mb-1">Bölüm (Chapter)</label>
+            <select id="chapterSelect" onchange="onChapterChange()" class="w-full bg-slate-50 border border-slate-200 rounded-xl px-3 py-2 text-sm font-semibold text-slate-700 focus:outline-sky-500">
+              <option value="ch1">Chapter 1: 28 Harfi Tanıma</option>
+              <option value="ch2" selected>Chapter 2: 1. Beşli (Elif, Be, Te, Se, Cim)</option>
+              <option value="ch3">Chapter 3: 2. Beşli (Ha, Hı, Dal, Zel, Rı)</option>
+              <option value="ch4">Chapter 4: 3. Beşli (Ze, Sin, Şın, Sad, Dad)</option>
+              <option value="ch5">Chapter 5: 4. Beşli (Tı, Zı, Ayın, Gayın, Fe)</option>
+              <option value="ch6">Chapter 6: 5. Beşli (Kaf, Kef, Lam, Mim, Nun)</option>
+              <option value="ch7">Chapter 7: 6. Grup (Vav, He, Lamelif, Ye)</option>
+              <option value="ch8">Chapter 8+: Karışık Kelimeler & Tecvid</option>
+              <option value="ch15">Chapter 15-20: Namaz Duaları ve Sureler</option>
+            </select>
+          </div>
+
+          <div>
+            <label class="block text-xs font-bold text-slate-500 mb-1">İçerik Türü</label>
+            <select id="itemTypeSelect" class="w-full bg-slate-50 border border-slate-200 rounded-xl px-3 py-2 text-sm font-semibold text-slate-700 focus:outline-sky-500">
+              <option value="lesson">📖 Normal Alıştırma / Ders</option>
+              <option value="quiz">🏆 Bölüm Sonu Sözlü Sınav (Quiz Kelimesi)</option>
+            </select>
+          </div>
+        </div>
+      </div>
+
+      <!-- Sanal Arapça ve Okutucu Klavyesi -->
+      <div class="bg-white p-5 rounded-3xl border border-slate-200 shadow-xs flex flex-col gap-4">
+        <div class="flex items-center justify-between">
+          <h2 class="font-title font-bold text-sm text-slate-700 flex items-center gap-1.5">
+            <span class="material-symbols-outlined text-amber-500 text-[18px]">keyboard</span>
+            <span>2. Sanal Arapça & Okutucu Klavyesi</span>
+          </h2>
+          <span class="text-[11px] text-slate-400">Harflere ve okutuculara sırayla tıklayın</span>
+        </div>
+
+        <!-- YAZIM ALANI (CANLI METİN) -->
+        <div class="relative bg-slate-50 border-2 border-dashed border-sky-300 rounded-2xl p-4 flex items-center justify-between">
+          <div class="flex flex-col">
+            <span class="text-[10px] font-bold text-slate-400 uppercase tracking-wider">Yazılan Kelime</span>
+            <input type="text" id="arabicInput" placeholder="Aşağıdaki tuşlarla yazın..." 
+                   class="font-arabic text-4xl text-sky-900 bg-transparent border-none focus:outline-none placeholder:text-slate-300 w-full" dir="rtl"/>
+          </div>
+          <div class="flex items-center gap-1">
+            <button onclick="backspace()" class="key-btn w-10 h-10 rounded-xl bg-rose-100 text-rose-700 font-bold flex items-center justify-center hover:bg-rose-200">
+              ⌫
+            </button>
+            <button onclick="clearInput()" class="key-btn px-3 h-10 rounded-xl bg-slate-200 text-slate-700 text-xs font-bold flex items-center justify-center hover:bg-slate-300">
+              Temizle
+            </button>
+          </div>
+        </div>
+
+        <!-- 1. GRUP: HAREKELER VE SÜKUN (Üstün, Esre, Ötre, Cezm, Şedde) -->
+        <div>
+          <span class="text-xs font-bold text-slate-600 block mb-1.5">Temel Harekeler & İşaretler:</span>
+          <div class="grid grid-cols-5 gap-1.5">
+            <button onclick="insertChar('\u064E', 'Üstün')" class="key-btn p-2 rounded-xl bg-amber-50 border border-amber-200 text-amber-950 flex flex-col items-center hover:bg-amber-100">
+              <span class="font-arabic text-2xl font-bold">ـَ</span>
+              <span class="text-[10px] font-semibold">Üstün</span>
+            </button>
+            <button onclick="insertChar('\u0650', 'Esre')" class="key-btn p-2 rounded-xl bg-amber-50 border border-amber-200 text-amber-950 flex flex-col items-center hover:bg-amber-100">
+              <span class="font-arabic text-2xl font-bold">ـِ</span>
+              <span class="text-[10px] font-semibold">Esre</span>
+            </button>
+            <button onclick="insertChar('\u064F', 'Ötre')" class="key-btn p-2 rounded-xl bg-amber-50 border border-amber-200 text-amber-950 flex flex-col items-center hover:bg-amber-100">
+              <span class="font-arabic text-2xl font-bold">ـُ</span>
+              <span class="text-[10px] font-semibold">Ötre</span>
+            </button>
+            <button onclick="insertChar('\u0652', 'Cezm')" class="key-btn p-2 rounded-xl bg-rose-50 border border-rose-200 text-rose-950 flex flex-col items-center hover:bg-rose-100">
+              <span class="font-arabic text-2xl font-bold">ـْ</span>
+              <span class="text-[10px] font-semibold">Cezm</span>
+            </button>
+            <button onclick="insertChar('\u0651', 'Şedde')" class="key-btn p-2 rounded-xl bg-rose-50 border border-rose-200 text-rose-950 flex flex-col items-center hover:bg-rose-100">
+              <span class="font-arabic text-2xl font-bold">ـّ</span>
+              <span class="text-[10px] font-semibold">Şedde</span>
+            </button>
+          </div>
+        </div>
+
+        <!-- 2. GRUP: TENVİNLER (İki Üstün, İki Esre, İki Ötre) -->
+        <div>
+          <span class="text-xs font-bold text-slate-600 block mb-1.5">Tenvinler (İkili Harekeler):</span>
+          <div class="grid grid-cols-3 gap-1.5">
+            <button onclick="insertChar('\u064B', 'İki Üstün')" class="key-btn p-2 rounded-xl bg-emerald-50 border border-emerald-200 text-emerald-950 flex flex-col items-center hover:bg-emerald-100">
+              <span class="font-arabic text-2xl font-bold">ـً</span>
+              <span class="text-[10px] font-semibold">İki Üstün</span>
+            </button>
+            <button onclick="insertChar('\u064D', 'İki Esre')" class="key-btn p-2 rounded-xl bg-emerald-50 border border-emerald-200 text-emerald-950 flex flex-col items-center hover:bg-emerald-100">
+              <span class="font-arabic text-2xl font-bold">ـٍ</span>
+              <span class="text-[10px] font-semibold">İki Esre</span>
+            </button>
+            <button onclick="insertChar('\u064C', 'İki Ötre')" class="key-btn p-2 rounded-xl bg-emerald-50 border border-emerald-200 text-emerald-950 flex flex-col items-center hover:bg-emerald-100">
+              <span class="font-arabic text-2xl font-bold">ـٌ</span>
+              <span class="text-[10px] font-semibold">İki Ötre</span>
+            </button>
+          </div>
+        </div>
+
+        <!-- 3. GRUP: ÇEKERLER VE MEDLER (Elif Çeker, Ye Çeker, Vav Çeker, Medd) -->
+        <div>
+          <span class="text-xs font-bold text-slate-600 block mb-1.5">Çekerler & Uzatmalar (Medler):</span>
+          <div class="grid grid-cols-4 gap-1.5">
+            <button onclick="insertChar('\u0670', 'Elif Çeker')" class="key-btn p-2 rounded-xl bg-indigo-50 border border-indigo-200 text-indigo-950 flex flex-col items-center hover:bg-indigo-100">
+              <span class="font-arabic text-2xl font-bold">ـٰ</span>
+              <span class="text-[10px] font-semibold">Elif Çeker</span>
+            </button>
+            <button onclick="insertChar('\u0656', 'Ye Çeker')" class="key-btn p-2 rounded-xl bg-indigo-50 border border-indigo-200 text-indigo-950 flex flex-col items-center hover:bg-indigo-100">
+              <span class="font-arabic text-2xl font-bold">ـٖ</span>
+              <span class="text-[10px] font-semibold">Ye Çeker</span>
+            </button>
+            <button onclick="insertChar('\u0657', 'Vav Çeker')" class="key-btn p-2 rounded-xl bg-indigo-50 border border-indigo-200 text-indigo-950 flex flex-col items-center hover:bg-indigo-100">
+              <span class="font-arabic text-2xl font-bold">ـٗ</span>
+              <span class="text-[10px] font-semibold">Vav Çeker</span>
+            </button>
+            <button onclick="insertChar('\u0653', 'Medd')" class="key-btn p-2 rounded-xl bg-purple-50 border border-purple-200 text-purple-950 flex flex-col items-center hover:bg-purple-100">
+              <span class="font-arabic text-2xl font-bold">ـٓ</span>
+              <span class="text-[10px] font-semibold">Medd (Dalga)</span>
+            </button>
+          </div>
+        </div>
+
+        <!-- 4. GRUP: 28 ARAPÇA HARF -->
+        <div>
+          <span class="text-xs font-bold text-slate-600 block mb-1.5">28 Harf (5'li Kardeş Gruplar):</span>
+          <div class="grid grid-cols-7 sm:grid-cols-10 gap-1.5 text-center">
+            <!-- 1. Beşli -->
+            <button onclick="insertChar('ا', 'Elif')" class="key-btn p-2 rounded-xl bg-white border border-slate-200 text-slate-800 font-arabic text-2xl hover:bg-sky-50">ا</button>
+            <button onclick="insertChar('ب', 'Be')" class="key-btn p-2 rounded-xl bg-white border border-slate-200 text-slate-800 font-arabic text-2xl hover:bg-sky-50">ب</button>
+            <button onclick="insertChar('ت', 'Te')" class="key-btn p-2 rounded-xl bg-white border border-slate-200 text-slate-800 font-arabic text-2xl hover:bg-sky-50">ت</button>
+            <button onclick="insertChar('ث', 'Se')" class="key-btn p-2 rounded-xl bg-white border border-slate-200 text-slate-800 font-arabic text-2xl hover:bg-sky-50">ث</button>
+            <button onclick="insertChar('ج', 'Cim')" class="key-btn p-2 rounded-xl bg-white border border-slate-200 text-slate-800 font-arabic text-2xl hover:bg-sky-50">ج</button>
+            
+            <!-- 2. Beşli -->
+            <button onclick="insertChar('ح', 'Ha')" class="key-btn p-2 rounded-xl bg-white border border-slate-200 text-slate-800 font-arabic text-2xl hover:bg-sky-50">ح</button>
+            <button onclick="insertChar('خ', 'Hı')" class="key-btn p-2 rounded-xl bg-white border border-slate-200 text-slate-800 font-arabic text-2xl hover:bg-sky-50">خ</button>
+            <button onclick="insertChar('د', 'Dal')" class="key-btn p-2 rounded-xl bg-white border border-slate-200 text-slate-800 font-arabic text-2xl hover:bg-sky-50">د</button>
+            <button onclick="insertChar('ذ', 'Zel')" class="key-btn p-2 rounded-xl bg-white border border-slate-200 text-slate-800 font-arabic text-2xl hover:bg-sky-50">ذ</button>
+            <button onclick="insertChar('ر', 'Rı')" class="key-btn p-2 rounded-xl bg-white border border-slate-200 text-slate-800 font-arabic text-2xl hover:bg-sky-50">ر</button>
+            
+            <!-- 3. Beşli -->
+            <button onclick="insertChar('ز', 'Ze')" class="key-btn p-2 rounded-xl bg-white border border-slate-200 text-slate-800 font-arabic text-2xl hover:bg-sky-50">ز</button>
+            <button onclick="insertChar('س', 'Sin')" class="key-btn p-2 rounded-xl bg-white border border-slate-200 text-slate-800 font-arabic text-2xl hover:bg-sky-50">س</button>
+            <button onclick="insertChar('ش', 'Şın')" class="key-btn p-2 rounded-xl bg-white border border-slate-200 text-slate-800 font-arabic text-2xl hover:bg-sky-50">ش</button>
+            <button onclick="insertChar('ص', 'Sad')" class="key-btn p-2 rounded-xl bg-white border border-slate-200 text-slate-800 font-arabic text-2xl hover:bg-sky-50">ص</button>
+            <button onclick="insertChar('ض', 'Dad')" class="key-btn p-2 rounded-xl bg-white border border-slate-200 text-slate-800 font-arabic text-2xl hover:bg-sky-50">ض</button>
+            
+            <!-- 4. Beşli -->
+            <button onclick="insertChar('ط', 'Tı')" class="key-btn p-2 rounded-xl bg-white border border-slate-200 text-slate-800 font-arabic text-2xl hover:bg-sky-50">ط</button>
+            <button onclick="insertChar('ظ', 'Zı')" class="key-btn p-2 rounded-xl bg-white border border-slate-200 text-slate-800 font-arabic text-2xl hover:bg-sky-50">ظ</button>
+            <button onclick="insertChar('ع', 'Ayın')" class="key-btn p-2 rounded-xl bg-white border border-slate-200 text-slate-800 font-arabic text-2xl hover:bg-sky-50">ع</button>
+            <button onclick="insertChar('غ', 'Gayın')" class="key-btn p-2 rounded-xl bg-white border border-slate-200 text-slate-800 font-arabic text-2xl hover:bg-sky-50">غ</button>
+            <button onclick="insertChar('ف', 'Fe')" class="key-btn p-2 rounded-xl bg-white border border-slate-200 text-slate-800 font-arabic text-2xl hover:bg-sky-50">ف</button>
+            
+            <!-- 5. Beşli & Kalanlar -->
+            <button onclick="insertChar('ق', 'Kaf')" class="key-btn p-2 rounded-xl bg-white border border-slate-200 text-slate-800 font-arabic text-2xl hover:bg-sky-50">ق</button>
+            <button onclick="insertChar('ك', 'Kef')" class="key-btn p-2 rounded-xl bg-white border border-slate-200 text-slate-800 font-arabic text-2xl hover:bg-sky-50">ك</button>
+            <button onclick="insertChar('ل', 'Lam')" class="key-btn p-2 rounded-xl bg-white border border-slate-200 text-slate-800 font-arabic text-2xl hover:bg-sky-50">ل</button>
+            <button onclick="insertChar('م', 'Mim')" class="key-btn p-2 rounded-xl bg-white border border-slate-200 text-slate-800 font-arabic text-2xl hover:bg-sky-50">م</button>
+            <button onclick="insertChar('ن', 'Nun')" class="key-btn p-2 rounded-xl bg-white border border-slate-200 text-slate-800 font-arabic text-2xl hover:bg-sky-50">ن</button>
+            <button onclick="insertChar('و', 'Vav')" class="key-btn p-2 rounded-xl bg-white border border-slate-200 text-slate-800 font-arabic text-2xl hover:bg-sky-50">و</button>
+            <button onclick="insertChar('ه', 'He')" class="key-btn p-2 rounded-xl bg-white border border-slate-200 text-slate-800 font-arabic text-2xl hover:bg-sky-50">ه</button>
+            <button onclick="insertChar('لا', 'Lamelif')" class="key-btn p-2 rounded-xl bg-white border border-slate-200 text-slate-800 font-arabic text-2xl hover:bg-sky-50">لا</button>
+            <button onclick="insertChar('ي', 'Ye')" class="key-btn p-2 rounded-xl bg-white border border-slate-200 text-slate-800 font-arabic text-2xl hover:bg-sky-50">ي</button>
+            <button onclick="insertChar(' ', 'Boşluk')" class="key-btn p-2 rounded-xl bg-slate-100 border border-slate-200 text-slate-600 text-xs font-bold hover:bg-slate-200">Space</button>
+          </div>
+        </div>
+
+        <!-- EK BİLGİLER FORMU -->
+        <div class="grid grid-cols-1 sm:grid-cols-2 gap-3 pt-2 border-t border-slate-100">
+          <div>
+            <label class="block text-xs font-bold text-slate-600 mb-1">Türkçe Okunuşu (Transliteration)</label>
+            <input type="text" id="transliterationInput" placeholder="Örn: E-be veya Eb-bet" 
+                   class="w-full bg-slate-50 border border-slate-200 rounded-xl px-3 py-2 text-sm text-slate-700 font-medium focus:outline-sky-500"/>
+          </div>
+          <div>
+            <label class="block text-xs font-bold text-slate-600 mb-1">Pedagojik İpucu (İsteğe Bağlı)</label>
+            <input type="text" id="hintInput" placeholder="Örn: Be harfini iki kere bastır!" 
+                   class="w-full bg-slate-50 border border-slate-200 rounded-xl px-3 py-2 text-sm text-slate-700 font-medium focus:outline-sky-500"/>
+          </div>
+        </div>
+
+        <!-- EKLE BUTONU -->
+        <button onclick="addWordToCurriculum()" class="w-full py-3 bg-sky-600 hover:bg-sky-700 text-white font-title font-bold text-sm rounded-2xl shadow-sm transition-all flex items-center justify-center gap-1.5 mt-1">
+          <span class="material-symbols-outlined text-[18px]">add_circle</span>
+          <span>Bu Kombinasyonu Bölüme Kaydet</span>
+        </button>
+      </div>
+
+    </div>
+
+    <!-- SAĞ KOLON: CANLI HECELEME ANİMASYONU VE LİSTE (5 Kolon) -->
+    <div class="lg:col-span-5 flex flex-col gap-5">
+      
+      <!-- CANLI ANİMASYON ÖNİZLEMESİ (Çocuk Ekranı Simülatörü) -->
+      <div class="bg-white p-5 rounded-3xl border border-slate-200 shadow-xs flex flex-col items-center">
+        <div class="flex items-center justify-between w-full mb-3">
+          <h2 class="font-title font-bold text-sm text-slate-700 flex items-center gap-1.5">
+            <span class="material-symbols-outlined text-purple-600 text-[18px]">play_circle</span>
+            <span>Çocuk Önizlemesi & Heceleme Animasyonu</span>
+          </h2>
+          <span class="text-[10px] bg-purple-50 text-purple-700 font-bold px-2 py-0.5 rounded-full">Canlı Test</span>
+        </div>
+
+        <!-- Önizleme Kartı -->
+        <div class="w-full bg-sky-50 rounded-2xl p-6 flex flex-col items-center justify-center relative border border-sky-100 min-h-[220px]">
+          <!-- Hüdhüd Maskot Balonu -->
+          <div class="w-full bg-white rounded-xl p-2.5 shadow-xs flex items-center gap-2 mb-4">
+            <span class="text-2xl">🦜</span>
+            <p id="previewHocaningSozu" class="text-xs text-slate-600 leading-snug font-medium">
+              "Elif'in üstünü var: E, Be'nin üstünü var: Be. Birleştir: E-BE!"
+            </p>
+          </div>
+
+          <!-- Parçalanan ve Birleşen Harfler Arenası -->
+          <div id="animationStage" class="flex items-center justify-center gap-6 my-2 transition-all duration-500">
+            <!-- 1. Parça -->
+            <div id="part1" class="w-20 h-24 bg-white rounded-2xl shadow-sm border border-slate-200 flex flex-col items-center justify-center transition-all duration-300">
+              <span id="part1Symbol" class="font-arabic text-4xl text-sky-800 leading-none">اَ</span>
+              <span id="part1Label" class="text-[10px] font-bold text-slate-400 mt-1">E</span>
+            </div>
+            <!-- 2. Parça -->
+            <div id="part2" class="w-20 h-24 bg-white rounded-2xl shadow-sm border border-slate-200 flex flex-col items-center justify-center transition-all duration-300">
+              <span id="part2Symbol" class="font-arabic text-4xl text-sky-800 leading-none">بَ</span>
+              <span id="part2Label" class="text-[10px] font-bold text-slate-400 mt-1">Be</span>
+            </div>
+          </div>
+
+          <!-- Birleşik Büyük Sonuç (Animasyon sonunda gösterilir) -->
+          <div id="combinedResult" class="hidden font-arabic text-6xl text-sky-900 leading-none my-3 select-none">
+            اَبَ
+          </div>
+
+          <!-- Animasyonu Başlat Butonu -->
+          <button onclick="playSyllableAnimation()" class="mt-3 px-4 py-1.5 rounded-full bg-white border border-sky-200 text-sky-700 text-xs font-bold shadow-xs hover:bg-sky-100 flex items-center gap-1">
+            <span class="material-symbols-outlined text-[16px]">play_arrow</span>
+            <span>Heceleme Animasyonunu Oynat</span>
+          </button>
+        </div>
+      </div>
+
+      <!-- SEÇİLİ BÖLÜMÜN KAYITLI KELİMELERİ LİSTESİ -->
+      <div class="bg-white p-5 rounded-3xl border border-slate-200 shadow-xs flex-1 flex flex-col">
+        <div class="flex items-center justify-between mb-3">
+          <h2 class="font-title font-bold text-sm text-slate-700 flex items-center gap-1.5">
+            <span class="material-symbols-outlined text-emerald-600 text-[18px]">list_alt</span>
+            <span id="listTitle">Bu Bölümdeki Kelimeler (0)</span>
+          </h2>
+          <span class="text-xs text-slate-400">Otomatik kaydedilir</span>
+        </div>
+
+        <!-- Kelime Listesi Kartları -->
+        <div id="wordsList" class="flex flex-col gap-2 overflow-y-auto max-h-[360px] pr-1">
+          <!-- JS ile doldurulacak -->
+        </div>
+      </div>
+
+    </div>
+
+  </main>
+
+  <!-- JAVASCRIPT: KLAVYE, HECELEME MANTIĞI VE VERİ YÖNETİMİ -->
+  <script>
+    // Müfredat Verisi (LocalStorage ile kalıcı)
+    let curriculumDB = JSON.parse(localStorage.getItem('elifba_curriculum_v2')) || {
+      'ch2': [
+        {
+          arabic: 'اَبَ',
+          transliteration: 'E-be',
+          hint: 'Elif üstün: E, Be üstün: Be',
+          type: 'lesson',
+          syllables: [
+            { symbol: 'اَ', label: 'E', sound: 'Elif\'in üstünü var: E' },
+            { symbol: 'بَ', label: 'Be', sound: 'Be\'nin üstünü var: Be' }
+          ]
+        },
+        {
+          arabic: 'اِبِ',
+          transliteration: 'İ-bi',
+          hint: 'Elif esre: İ, Be esre: Bi',
+          type: 'lesson',
+          syllables: [
+            { symbol: 'اِ', label: 'İ', sound: 'Elif\'in esresi var: İ' },
+            { symbol: 'بِ', label: 'Bi', sound: 'Be\'nin esresi var: Bi' }
+          ]
+        },
+        {
+          arabic: 'اَبَتَ',
+          transliteration: 'E-be-te',
+          hint: 'Elif üstün: E, Be üstün: Be, Te üstün: Te',
+          type: 'lesson',
+          syllables: [
+            { symbol: 'اَ', label: 'E', sound: 'E' },
+            { symbol: 'بَ', label: 'Be', sound: 'Be' },
+            { symbol: 'تَ', label: 'Te', sound: 'Te' }
+          ]
+        },
+        {
+          arabic: 'اَبَّتْ',
+          transliteration: 'Eb-bet',
+          hint: 'Şeddeli Be ve Cezmli Te!',
+          type: 'quiz',
+          syllables: [
+            { symbol: 'اَبَّ', label: 'Ebbe', sound: 'Şeddeli Be' },
+            { symbol: 'تْ', label: 't', sound: 'Cezmli Te' }
+          ]
+        }
+      ]
+    };
+
+    const arabicInput = document.getElementById('arabicInput');
+    const transliterationInput = document.getElementById('transliterationInput');
+    const hintInput = document.getElementById('hintInput');
+    const chapterSelect = document.getElementById('chapterSelect');
+    const itemTypeSelect = document.getElementById('itemTypeSelect');
+
+    // Klavye karakter ekleme
+    function insertChar(char, name) {
+      arabicInput.value += char;
+      arabicInput.focus();
+      updatePreviewFromInput();
+    }
+
+    function backspace() {
+      arabicInput.value = arabicInput.value.slice(0, -1);
+      updatePreviewFromInput();
+    }
+
+    function clearInput() {
+      arabicInput.value = '';
+      transliterationInput.value = '';
+      hintInput.value = '';
+      updatePreviewFromInput();
+    }
+
+    // Girişe göre canlı önizlemeyi güncelle
+    function updatePreviewFromInput() {
+      const text = arabicInput.value.trim();
+      const part1Symbol = document.getElementById('part1Symbol');
+      const part2Symbol = document.getElementById('part2Symbol');
+      const combinedResult = document.getElementById('combinedResult');
+      const hocaningSozu = document.getElementById('previewHocaningSozu');
+
+      if (!text) {
+        part1Symbol.textContent = 'اَ';
+        part2Symbol.textContent = 'بَ';
+        combinedResult.textContent = 'اَبَ';
+        hocaningSozu.textContent = '"Elif\'in üstünü var: E, Be\'nin üstünü var: Be. Birleştir: E-BE!"';
+        return;
+      }
+
+      combinedResult.textContent = text;
+      
+      // Basit 2 parçalı hece bölme görseli
+      if (text.length >= 2) {
+        const mid = Math.ceil(text.length / 2);
+        part1Symbol.textContent = text.slice(0, mid);
+        part2Symbol.textContent = text.slice(mid);
+      } else {
+        part1Symbol.textContent = text;
+        part2Symbol.textContent = '';
+      }
+
+      const translit = transliterationInput.value.trim() || '...';
+      hocaningSozu.textContent = `Telif Okunuşu: "${translit}!"`;
+    }
+
+    // Heceleme Animasyonunu Oynat
+    function playSyllableAnimation() {
+      const part1 = document.getElementById('part1');
+      const part2 = document.getElementById('part2');
+      const stage = document.getElementById('animationStage');
+      const combined = document.getElementById('combinedResult');
+      const hocaningSozu = document.getElementById('previewHocaningSozu');
+
+      stage.classList.remove('hidden');
+      combined.classList.add('hidden');
+      part1.className = "w-20 h-24 bg-white rounded-2xl shadow-sm border border-slate-200 flex flex-col items-center justify-center transition-all duration-300";
+      part2.className = "w-20 h-24 bg-white rounded-2xl shadow-sm border border-slate-200 flex flex-col items-center justify-center transition-all duration-300";
+
+      // 1. Adım: 1. Harf parlar
+      part1.classList.add('scale-115', 'border-amber-400', 'bg-amber-50', 'shadow-md');
+      hocaningSozu.textContent = "1. Harf ışıldıyor: 'Elif'in üstünü var: E!'";
+      
+      // 2. Adım: 2. Harf parlar (1.2 saniye sonra)
+      setTimeout(() => {
+        part1.classList.remove('scale-115', 'border-amber-400', 'bg-amber-50', 'shadow-md');
+        part2.classList.add('scale-115', 'border-amber-400', 'bg-amber-50', 'shadow-md');
+        hocaningSozu.textContent = "2. Harf ışıldıyor: 'Be'nin üstünü var: Be!'";
+      }, 1200);
+
+      // 3. Adım: Mıknatıs gibi birleşirler (2.4 saniye sonra)
+      setTimeout(() => {
+        part2.classList.remove('scale-115', 'border-amber-400', 'bg-amber-50', 'shadow-md');
+        stage.classList.add('gap-0');
+        hocaningSozu.textContent = "Şimdi ikisini birleştiriyoruz: 'E-BE!' 🎉";
+      }, 2400);
+
+      // 4. Adım: Tam birleşik kartı göster
+      setTimeout(() => {
+        stage.classList.add('hidden');
+        stage.classList.remove('gap-0');
+        combined.classList.remove('hidden');
+        combined.classList.add('animate-bounce');
+        setTimeout(() => combined.classList.remove('animate-bounce'), 800);
+      }, 3300);
+    }
+
+    // Kelimeyi Müfredata Ekle
+    function addWordToCurriculum() {
+      const arabic = arabicInput.value.trim();
+      const transliteration = transliterationInput.value.trim();
+      const hint = hintInput.value.trim();
+      const chapter = chapterSelect.value;
+      const type = itemTypeSelect.value;
+
+      if (!arabic) {
+        alert('Lütfen en az bir Arapça harf/kelime yazın!');
+        return;
+      }
+
+      if (!curriculumDB[chapter]) {
+        curriculumDB[chapter] = [];
+      }
+
+      curriculumDB[chapter].push({
+        arabic: arabic,
+        transliteration: transliteration || arabic,
+        hint: hint || 'Tane tane oku!',
+        type: type
+      });
+
+      // Kaydet
+      localStorage.setItem('elifba_curriculum_v2', JSON.stringify(curriculumDB));
+      
+      // Temizle ve listeyi yenile
+      clearInput();
+      renderWordsList();
+      alert('Kelime başarıyla bölüme eklendi! 🎉');
+    }
+
+    // Seçili Chapter'ın Listesini Göster
+    function renderWordsList() {
+      const chapter = chapterSelect.value;
+      const listContainer = document.getElementById('wordsList');
+      const listTitle = document.getElementById('listTitle');
+      const words = curriculumDB[chapter] || [];
+
+      listTitle.textContent = `${chapterSelect.options[chapterSelect.selectedIndex].text} (${words.length})`;
+      listContainer.innerHTML = '';
+
+      if (words.length === 0) {
+        listContainer.innerHTML = `
+          <div class="text-center py-8 text-slate-400 text-xs">
+            Bu bölümde henüz kelime yok. Soldaki klavyeden hemen ekleyin!
+          </div>
+        `;
+        return;
+      }
+
+      words.forEach((item, index) => {
+        const isQuiz = item.type === 'quiz';
+        const card = document.createElement('div');
+        card.className = "flex items-center justify-between p-3 rounded-2xl border border-slate-100 bg-slate-50 hover:bg-white transition-all shadow-2xs";
+        card.innerHTML = `
+          <div class="flex items-center gap-3">
+            <span class="w-6 h-6 rounded-full bg-slate-200 text-slate-600 text-[10px] font-bold flex items-center justify-center">
+              ${index + 1}
+            </span>
+            <span class="font-arabic text-3xl text-sky-950 font-bold px-1">${item.arabic}</span>
+            <div class="flex flex-col">
+              <span class="font-bold text-xs text-slate-700">${item.transliteration}</span>
+              <span class="text-[10px] text-slate-400">${item.hint}</span>
+            </div>
+          </div>
+
+          <div class="flex items-center gap-1.5">
+            <span class="text-[9px] font-bold px-2 py-0.5 rounded-full ${isQuiz ? 'bg-amber-100 text-amber-800' : 'bg-sky-100 text-sky-800'}">
+              ${isQuiz ? '🏆 Quiz' : '📖 Ders'}
+            </span>
+            <button onclick="deleteWord(${index})" class="text-rose-400 hover:text-rose-600 p-1 text-xs">
+              🗑️
+            </button>
+          </div>
+        `;
+        listContainer.appendChild(card);
+      });
+    }
+
+    function deleteWord(index) {
+      const chapter = chapterSelect.value;
+      if (confirm('Bu kelimeyi silmek istediğinize emin misiniz?')) {
+        curriculumDB[chapter].splice(index, 1);
+        localStorage.setItem('elifba_curriculum_v2', JSON.stringify(curriculumDB));
+        renderWordsList();
+      }
+    }
+
+    function onChapterChange() {
+      renderWordsList();
+    }
+
+    // JSON Olarak Dışa Aktar
+    function exportCurriculumJSON() {
+      const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(curriculumDB, null, 2));
+      const downloadAnchor = document.createElement('a');
+      downloadAnchor.setAttribute("href", dataStr);
+      downloadAnchor.setAttribute("download", "elifba_mufredat_tam.json");
+      document.body.appendChild(downloadAnchor);
+      downloadAnchor.click();
+      downloadAnchor.remove();
+    }
+
+    // İlk Yükleme
+    renderWordsList();
+  </script>
+</body>
+</html>
