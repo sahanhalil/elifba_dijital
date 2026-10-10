@@ -1,0 +1,81 @@
+{
+  "ch2": [
+    {
+      "arabic": "اَبَ",
+      "transliteration": "E-be",
+      "hint": "Elif üstün: E, Be üstün: Be",
+      "type": "lesson",
+      "syllables": [
+        {
+          "symbol": "اَ",
+          "label": "E",
+          "sound": "Elif'in üstünü var: E"
+        },
+        {
+          "symbol": "بَ",
+          "label": "Be",
+          "sound": "Be'nin üstünü var: Be"
+        }
+      ]
+    },
+    {
+      "arabic": "اِبِ",
+      "transliteration": "İ-bi",
+      "hint": "Elif esre: İ, Be esre: Bi",
+      "type": "lesson",
+      "syllables": [
+        {
+          "symbol": "اِ",
+          "label": "İ",
+          "sound": "Elif'in esresi var: İ"
+        },
+        {
+          "symbol": "بِ",
+          "label": "Bi",
+          "sound": "Be'nin esresi var: Bi"
+        }
+      ]
+    },
+    {
+      "arabic": "اَبَتَ",
+      "transliteration": "E-be-te",
+      "hint": "Elif üstün: E, Be üstün: Be, Te üstün: Te",
+      "type": "lesson",
+      "syllables": [
+        {
+          "symbol": "اَ",
+          "label": "E",
+          "sound": "E"
+        },
+        {
+          "symbol": "بَ",
+          "label": "Be",
+          "sound": "Be"
+        },
+        {
+          "symbol": "تَ",
+          "label": "Te",
+          "sound": "Te"
+        }
+      ]
+    },
+    {
+      "arabic": "اَبَّتْ",
+      "transliteration": "Eb-bet",
+      "hint": "Şeddeli Be ve Cezmli Te!",
+      "type": "quiz",
+      "syllables": [
+        {
+          "symbol": "اَبَّ",
+          "label": "Ebbe",
+          "sound": "Şeddeli Be"
+        },
+        {
+          "symbol": "تْ",
+          "label": "t",
+          "sound": "Cezmli Te"
+        }
+      ]
+    }
+  ]
+}

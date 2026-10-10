@@ -25,6 +25,18 @@
       transform: translateY(2px);
       box-shadow: 0 1px 0 rgba(0,0,0,0.12);
     }
+    .v-cell {
+      font-family: 'Amiri', serif;
+      font-size: 1.5rem;
+      width: 100%;
+      text-align: center;
+      background: #f8fafc;
+      border: 1px solid #e2e8f0;
+      border-radius: 0.75rem;
+      padding: 0.25rem 0.25rem;
+      color: #0c4a6e;
+    }
+    .v-cell:focus { outline: 2px solid #0ea5e9; background: #fff; }
   </style>
 </head>
 <body class="bg-slate-50 text-slate-800 min-h-screen flex flex-col">
@@ -43,14 +55,23 @@
       </div>
 
       <div class="flex items-center gap-2">
-        <a href="http://localhost:8080" target="_blank" class="px-3.5 py-1.5 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-700 text-xs font-bold flex items-center gap-1.5 transition-colors">
+        <a href="index.html" target="_blank" class="px-3.5 py-1.5 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-700 text-xs font-bold flex items-center gap-1.5 transition-colors">
           <span class="material-symbols-outlined text-[16px]">visibility</span>
           <span>Çocuk Uygulamasını Aç</span>
+        </a>
+        <a href="harf_rehberi.html" target="_blank" class="px-3.5 py-1.5 rounded-xl bg-amber-100 hover:bg-amber-200 text-amber-900 text-xs font-bold flex items-center gap-1.5 transition-colors">
+          <span class="material-symbols-outlined text-[16px]">menu_book</span>
+          <span>Harf Yazılış Girişi</span>
         </a>
         <button onclick="exportCurriculumJSON()" class="px-4 py-1.5 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-bold flex items-center gap-1.5 shadow-sm transition-colors">
           <span class="material-symbols-outlined text-[16px]">download</span>
           <span>Müfredatı İndir (JSON)</span>
         </button>
+        <button onclick="document.getElementById('importFile').click()" class="px-4 py-1.5 rounded-xl bg-sky-600 hover:bg-sky-700 text-white text-xs font-bold flex items-center gap-1.5 shadow-sm transition-colors">
+          <span class="material-symbols-outlined text-[16px]">upload</span>
+          <span>JSON Yükle</span>
+        </button>
+        <input type="file" id="importFile" accept=".json,application/json" class="hidden" onchange="importCurriculumJSON(event)">
       </div>
     </div>
   </header>
@@ -203,6 +224,15 @@
 
         <!-- 4. GRUP: 28 ARAPÇA HARF -->
         <div>
+          <span class="text-xs font-bold text-slate-600 block mb-1.5">Yazılış Şekli (harfe tıklamadan önce seçin):</span>
+          <div id="formModeBar" class="grid grid-cols-5 gap-1.5 mb-3">
+            <button type="button" data-mode="auto" onclick="setFormMode('auto')" class="form-mode-btn key-btn py-1.5 rounded-xl border text-xs font-bold">Otomatik</button>
+            <button type="button" data-mode="isolated" onclick="setFormMode('isolated')" class="form-mode-btn key-btn py-1.5 rounded-xl border text-xs font-bold">Tekil</button>
+            <button type="button" data-mode="initial" onclick="setFormMode('initial')" class="form-mode-btn key-btn py-1.5 rounded-xl border text-xs font-bold">Başta</button>
+            <button type="button" data-mode="medial" onclick="setFormMode('medial')" class="form-mode-btn key-btn py-1.5 rounded-xl border text-xs font-bold">Ortada</button>
+            <button type="button" data-mode="final" onclick="setFormMode('final')" class="form-mode-btn key-btn py-1.5 rounded-xl border text-xs font-bold">Sonda</button>
+          </div>
+
           <span class="text-xs font-bold text-slate-600 block mb-1.5">28 Harf (5'li Kardeş Gruplar):</span>
           <div class="grid grid-cols-7 sm:grid-cols-10 gap-1.5 text-center">
             <!-- 1. Beşli -->
@@ -244,6 +274,69 @@
             <button onclick="insertChar('لا', 'Lamelif')" class="key-btn p-2 rounded-xl bg-white border border-slate-200 text-slate-800 font-arabic text-2xl hover:bg-sky-50">لا</button>
             <button onclick="insertChar('ي', 'Ye')" class="key-btn p-2 rounded-xl bg-white border border-slate-200 text-slate-800 font-arabic text-2xl hover:bg-sky-50">ي</button>
             <button onclick="insertChar(' ', 'Boşluk')" class="key-btn p-2 rounded-xl bg-slate-100 border border-slate-200 text-slate-600 text-xs font-bold hover:bg-slate-200">Space</button>
+          </div>
+        </div>
+
+        <!-- HARFİN YAZILIŞ ŞEKİLLERİ -->
+        <div class="pt-2 border-t border-slate-100">
+          <div class="flex items-center justify-between mb-1.5">
+            <span class="text-xs font-bold text-slate-600">Harfin Yazılış Şekilleri (isteğe bağlı)</span>
+            <label class="flex items-center gap-1.5 text-[11px] text-slate-500 font-semibold">
+              <input type="checkbox" id="saveFormsCheck" class="accent-sky-600"/>
+              Kayda ekle
+            </label>
+          </div>
+          <div class="flex items-center gap-2 mb-2">
+            <input type="text" id="formsLetterInput" maxlength="2" dir="rtl" placeholder="Harf"
+                   oninput="formsLetterEdited = true; renderFormsPreview()"
+                   class="font-arabic text-2xl w-20 text-center bg-slate-50 border border-slate-200 rounded-xl px-2 py-1 focus:outline-sky-500"/>
+            <span class="text-[11px] text-slate-400">Yazdığınız kelimenin son harfi otomatik alınır; elle değiştirebilirsiniz.</span>
+          </div>
+          <div class="grid grid-cols-4 gap-1.5 text-center">
+            <div class="bg-slate-50 border border-slate-200 rounded-xl py-2">
+              <div id="formIsolated" class="font-arabic text-3xl text-sky-900 min-h-[2.25rem]"></div>
+              <div class="text-[10px] font-semibold text-slate-500">Tekil</div>
+            </div>
+            <div class="bg-slate-50 border border-slate-200 rounded-xl py-2">
+              <div id="formInitial" class="font-arabic text-3xl text-sky-900 min-h-[2.25rem]"></div>
+              <div class="text-[10px] font-semibold text-slate-500">Başta</div>
+            </div>
+            <div class="bg-slate-50 border border-slate-200 rounded-xl py-2">
+              <div id="formMedial" class="font-arabic text-3xl text-sky-900 min-h-[2.25rem]"></div>
+              <div class="text-[10px] font-semibold text-slate-500">Ortada</div>
+            </div>
+            <div class="bg-slate-50 border border-slate-200 rounded-xl py-2">
+              <div id="formFinal" class="font-arabic text-3xl text-sky-900 min-h-[2.25rem]"></div>
+              <div class="text-[10px] font-semibold text-slate-500">Sonda</div>
+            </div>
+          </div>
+          <p id="formsNote" class="text-[10px] text-amber-600 mt-1.5 hidden">Bu harf kendinden sonraki harfe bitişmez; başta ve ortada şekli değişmez.</p>
+
+          <!-- 9 YAZILIŞ: elle yazılır -->
+          <div class="mt-3">
+            <div class="flex items-center justify-between mb-1.5">
+              <span class="text-xs font-bold text-slate-600">9 Yazılış (kutuya tıklayın, klavyeyle yazın)</span>
+              <button type="button" onclick="autoFillVoweled()" class="text-[11px] font-bold text-sky-700 hover:underline">Otomatik doldur</button>
+            </div>
+            <div class="grid grid-cols-4 gap-1.5 text-center items-center">
+              <div></div>
+              <div class="text-[10px] font-bold text-slate-500">Başta</div>
+              <div class="text-[10px] font-bold text-slate-500">Ortada</div>
+              <div class="text-[10px] font-bold text-slate-500">Sonda</div>
+              <div class="text-[10px] font-bold text-slate-500">Üstün</div>
+              <input type="text" id="v-initial-0" dir="rtl" class="v-cell"/>
+              <input type="text" id="v-medial-0" dir="rtl" class="v-cell"/>
+              <input type="text" id="v-final-0" dir="rtl" class="v-cell"/>
+              <div class="text-[10px] font-bold text-slate-500">Esre</div>
+              <input type="text" id="v-initial-1" dir="rtl" class="v-cell"/>
+              <input type="text" id="v-medial-1" dir="rtl" class="v-cell"/>
+              <input type="text" id="v-final-1" dir="rtl" class="v-cell"/>
+              <div class="text-[10px] font-bold text-slate-500">Ötre</div>
+              <input type="text" id="v-initial-2" dir="rtl" class="v-cell"/>
+              <input type="text" id="v-medial-2" dir="rtl" class="v-cell"/>
+              <input type="text" id="v-final-2" dir="rtl" class="v-cell"/>
+            </div>
+            <p class="text-[10px] text-slate-400 mt-1.5">Yazmak istediğiniz kutuya tıklayın; yukarıdaki klavye o kutuya yazar. Üstteki kelime alanına tıklarsanız yazı oraya döner.</p>
           </div>
         </div>
 
@@ -395,27 +488,144 @@
     const chapterSelect = document.getElementById('chapterSelect');
     const itemTypeSelect = document.getElementById('itemTypeSelect');
 
+    // --- Harf yazılış şekilleri (ZWJ / ZWNJ ile) ---
+    const ZWJ = '‍';   // bitiştirir
+    const ZWNJ = '‌';  // bitiştirmez
+    const NON_JOINING = 'ادذرزو';
+    const BASE_LETTER_RE = /[ء-غف-ي]/;
+    const DIACRITIC_RE = /^[ً-ٰٗ]$/;
+    const JOINERS_END_RE = /[‌‍]+$/;
+    let formMode = 'auto';
+    let formsLetterEdited = false;
+
+    function formsOf(letter) {
+      return {
+        isolated: letter,
+        initial: ZWNJ + letter + ZWJ,
+        medial: ZWJ + letter + ZWJ,
+        final: ZWJ + letter
+      };
+    }
+
+    function setFormMode(mode) {
+      formMode = mode;
+      document.querySelectorAll('.form-mode-btn').forEach(btn => {
+        const active = btn.dataset.mode === mode;
+        btn.classList.toggle('bg-sky-600', active);
+        btn.classList.toggle('text-white', active);
+        btn.classList.toggle('border-sky-600', active);
+        btn.classList.toggle('bg-white', !active);
+        btn.classList.toggle('text-slate-700', !active);
+        btn.classList.toggle('border-slate-200', !active);
+      });
+    }
+
     // Klavye karakter ekleme
+    // Klavyenin yazdığı alan: 9 yazılış kutularından biri ya da kelime alanı
+    let activeTarget = null;
+    const voweledCells = Array.from(document.querySelectorAll('.v-cell'));
+    voweledCells.forEach(cell => cell.addEventListener('focus', () => { activeTarget = cell; }));
+    arabicInput.addEventListener('focus', () => { activeTarget = null; });
+
     function insertChar(char, name) {
-      arabicInput.value += char;
-      arabicInput.focus();
+      const target = activeTarget || arabicInput;
+      if (DIACRITIC_RE.test(char)) {
+        // Hareke, sondaki birleştiricinin önüne girer ki harfe otursun
+        const m = target.value.match(JOINERS_END_RE);
+        const tail = m ? m[0] : '';
+        target.value = target.value.slice(0, target.value.length - tail.length) + char + tail;
+      } else if (formMode !== 'auto' && BASE_LETTER_RE.test(char[0])) {
+        target.value += formsOf(char)[formMode];
+      } else {
+        target.value += char;
+      }
+      target.focus();
       updatePreviewFromInput();
     }
 
     function backspace() {
-      arabicInput.value = arabicInput.value.slice(0, -1);
+      const target = activeTarget || arabicInput;
+      let v = target.value.replace(JOINERS_END_RE, '');
+      v = v.slice(0, -1).replace(JOINERS_END_RE, '');
+      target.value = v;
       updatePreviewFromInput();
     }
 
+    // 9 kutuyu harften otomatik doldur (sonra elle düzeltilebilir)
+    function autoFillVoweled() {
+      const letter = document.getElementById('formsLetterInput').value.trim();
+      if (!letter) { alert('Önce bir harf yazın.'); return; }
+
+      // "Harf Yazılış Girişi" sayfasında elle yazılmış değerler varsa onları kullan
+      try {
+        const saved = (JSON.parse(localStorage.getItem('elifba_letter_forms_v1')) || {})[letter];
+        if (saved && ['initial', 'medial', 'final'].some(p => (saved[p] || []).some(v => v && v.trim()))) {
+          for (let row = 0; row < 3; row++) {
+            ['initial', 'medial', 'final'].forEach(pos => {
+              document.getElementById(`v-${pos}-${row}`).value = (saved[pos] && saved[pos][row]) || '';
+            });
+          }
+          return;
+        }
+      } catch (e) { /* kayıt okunamadı: otomatik üretime düş */ }
+
+      const marks = ['َ', 'ِ', 'ُ'];
+      marks.forEach((mark, row) => {
+        document.getElementById(`v-initial-${row}`).value = ZWNJ + letter + mark + ZWJ;
+        document.getElementById(`v-medial-${row}`).value = ZWJ + letter + mark + ZWJ;
+        document.getElementById(`v-final-${row}`).value = ZWJ + letter + mark;
+      });
+    }
+
+    function readVoweled() {
+      const out = { initial: [], medial: [], final: [] };
+      let any = false;
+      for (let row = 0; row < 3; row++) {
+        ['initial', 'medial', 'final'].forEach(pos => {
+          const v = document.getElementById(`v-${pos}-${row}`).value.trim();
+          if (v) any = true;
+          out[pos].push(v);
+        });
+      }
+      return any ? out : null;
+    }
+
     function clearInput() {
+      voweledCells.forEach(c => { c.value = ''; });
       arabicInput.value = '';
       transliterationInput.value = '';
       hintInput.value = '';
+      formsLetterEdited = false;
+      document.getElementById('formsLetterInput').value = '';
       updatePreviewFromInput();
+    }
+
+    // Yazılış şekilleri önizlemesi
+    function lastBaseLetter(text) {
+      const chars = Array.from(text.replace(/[‌‍]/g, ''));
+      for (let i = chars.length - 1; i >= 0; i--) {
+        if (BASE_LETTER_RE.test(chars[i])) {
+          return (chars[i] === 'ا' && chars[i - 1] === 'ل') ? 'لا' : chars[i];
+        }
+      }
+      return '';
+    }
+
+    function renderFormsPreview() {
+      const letterInput = document.getElementById('formsLetterInput');
+      if (!formsLetterEdited) letterInput.value = lastBaseLetter(arabicInput.value);
+      const letter = letterInput.value.trim();
+      const f = letter ? formsOf(letter) : { isolated: '', initial: '', medial: '', final: '' };
+      document.getElementById('formIsolated').textContent = f.isolated;
+      document.getElementById('formInitial').textContent = f.initial;
+      document.getElementById('formMedial').textContent = f.medial;
+      document.getElementById('formFinal').textContent = f.final;
+      document.getElementById('formsNote').classList.toggle('hidden', !(letter && NON_JOINING.includes(letter)));
     }
 
     // Girişe göre canlı önizlemeyi güncelle
     function updatePreviewFromInput() {
+      renderFormsPreview();
       const text = arabicInput.value.trim();
       const part1Symbol = document.getElementById('part1Symbol');
       const part2Symbol = document.getElementById('part2Symbol');
@@ -504,12 +714,21 @@
         curriculumDB[chapter] = [];
       }
 
-      curriculumDB[chapter].push({
+      const entry = {
         arabic: arabic,
         transliteration: transliteration || arabic,
         hint: hint || 'Tane tane oku!',
         type: type
-      });
+      };
+
+      const formsLetter = document.getElementById('formsLetterInput').value.trim();
+      const voweled = readVoweled();
+      if (formsLetter && (document.getElementById('saveFormsCheck').checked || voweled)) {
+        entry.forms = { letter: formsLetter, ...formsOf(formsLetter) };
+        if (voweled) entry.forms.voweled = voweled;
+      }
+
+      curriculumDB[chapter].push(entry);
 
       // Kaydet
       localStorage.setItem('elifba_curriculum_v2', JSON.stringify(curriculumDB));
@@ -552,6 +771,7 @@
             <div class="flex flex-col">
               <span class="font-bold text-xs text-slate-700">${item.transliteration}</span>
               <span class="text-[10px] text-slate-400">${item.hint}</span>
+              ${item.forms ? `<span class="font-arabic text-lg text-slate-500" dir="rtl">${item.forms.isolated} ${item.forms.initial} ${item.forms.medial} ${item.forms.final}</span>` : ''}
             </div>
           </div>
 
@@ -592,7 +812,35 @@
       downloadAnchor.remove();
     }
 
+    // JSON Dosyasından İçe Aktar
+    function importCurriculumJSON(event) {
+      const file = event.target.files[0];
+      if (!file) return;
+      const reader = new FileReader();
+      reader.onload = () => {
+        try {
+          const data = JSON.parse(reader.result);
+          if (!data || typeof data !== 'object' || Array.isArray(data) ||
+              !Object.values(data).every(Array.isArray)) {
+            throw new Error('Geçersiz müfredat biçimi');
+          }
+          if (!confirm('Mevcut müfredatın yerine bu dosyadaki veri yüklenecek. Devam edilsin mi?')) return;
+          curriculumDB = data;
+          localStorage.setItem('elifba_curriculum_v2', JSON.stringify(curriculumDB));
+          renderWordsList();
+          alert('Müfredat başarıyla yüklendi.');
+        } catch (err) {
+          alert('Dosya yüklenemedi: ' + err.message);
+        } finally {
+          event.target.value = '';
+        }
+      };
+      reader.readAsText(file);
+    }
+
     // İlk Yükleme
+    setFormMode('auto');
+    renderFormsPreview();
     renderWordsList();
   </script>
 </body>

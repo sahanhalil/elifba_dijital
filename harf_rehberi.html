@@ -1,0 +1,187 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+  <meta charset="utf-8"/>
+  <meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+  <title>Harf Yazılış Girişi (29 harf x 9 yazılış)</title>
+  <link href="https://fonts.googleapis.com" rel="preconnect"/>
+  <link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect"/>
+  <link href="https://fonts.googleapis.com/css2?family=Amiri:wght@400;700&family=Nunito+Sans:wght@500;700&display=swap" rel="stylesheet"/>
+  <style>
+    * { box-sizing: border-box; }
+    body { margin: 0; font-family: 'Nunito Sans', sans-serif; background: #f1f5f9; color: #1e293b; }
+    header { position: sticky; top: 0; background: #fff; border-bottom: 1px solid #e2e8f0; padding: 10px 20px; z-index: 5; }
+    .top { display: flex; align-items: center; justify-content: space-between; gap: 12px; flex-wrap: wrap; }
+    h1 { font-size: 16px; margin: 0; }
+    header p { margin: 2px 0 0; font-size: 12px; color: #64748b; }
+    .actions { display: flex; gap: 6px; flex-wrap: wrap; }
+    .btn { font: inherit; font-size: 12px; font-weight: 700; text-decoration: none; border: 0; cursor: pointer;
+           padding: 7px 14px; border-radius: 12px; background: #e2e8f0; color: #334155; }
+    .btn.primary { background: #0284c7; color: #fff; }
+    .btn.green { background: #059669; color: #fff; }
+    .tools { margin-top: 8px; display: flex; gap: 6px; align-items: center; flex-wrap: wrap; font-size: 12px; color: #64748b; }
+    .tools .btn { font-family: 'Amiri', serif; font-size: 18px; padding: 2px 12px; background: #fef3c7; color: #78350f; }
+    #progress { margin-left: auto; font-weight: 700; color: #0f766e; }
+    main { max-width: 1100px; margin: 0 auto; padding: 20px; display: grid; gap: 14px;
+           grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); }
+    .card { background: #fff; border: 1px solid #e2e8f0; border-radius: 20px; padding: 14px; }
+    .card h2 { margin: 0 0 8px; display: flex; align-items: baseline; gap: 10px; font-size: 13px; color: #64748b; }
+    .card h2 .big { font-family: 'Amiri', serif; font-size: 34px; color: #0c4a6e; line-height: 1; }
+    .card h2 .warn { margin-left: auto; font-size: 10px; color: #b45309; background: #fef3c7; padding: 2px 8px; border-radius: 999px; }
+    table { width: 100%; border-collapse: separate; border-spacing: 4px; text-align: center; }
+    th { font-size: 10px; color: #64748b; font-weight: 700; }
+    input.cell { width: 100%; font-family: 'Amiri', serif; font-size: 28px; text-align: center; color: #0c4a6e;
+                 background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 12px; padding: 2px 2px; }
+    input.cell:focus { outline: 2px solid #0ea5e9; background: #fff; }
+    input.cell.filled { background: #ecfdf5; border-color: #6ee7b7; }
+  </style>
+</head>
+<body>
+  <header>
+    <div class="top">
+      <div>
+        <h1>Harf Yazılış Girişi</h1>
+        <p>29 harf × 9 yazılış (Başta / Ortada / Sonda × Üstün / Esre / Ötre). Kutular boştur; yazılışları siz girersiniz. Otomatik kaydedilir.</p>
+      </div>
+      <div class="actions">
+        <button class="btn green" onclick="exportForms()">JSON İndir</button>
+        <button class="btn primary" onclick="document.getElementById('importFile').click()">JSON Yükle</button>
+        <input type="file" id="importFile" accept=".json,application/json" hidden onchange="importForms(event)"/>
+        <a class="btn" href="admin.html">Admin Paneline Dön</a>
+      </div>
+    </div>
+    <div class="tools">
+      <span>Seçili kutuya ekle:</span>
+      <button class="btn" onmousedown="event.preventDefault()" onclick="insertMark('َ')" title="Üstün">ـَ</button>
+      <button class="btn" onmousedown="event.preventDefault()" onclick="insertMark('ِ')" title="Esre">ـِ</button>
+      <button class="btn" onmousedown="event.preventDefault()" onclick="insertMark('ُ')" title="Ötre">ـُ</button>
+      <button class="btn" onmousedown="event.preventDefault()" onclick="insertMark('‍')" title="Bitiştirici (ZWJ)" style="font-family:inherit;font-size:12px">Bitiştir (ZWJ)</button>
+      <button class="btn" onmousedown="event.preventDefault()" onclick="insertMark('‌')" title="Ayırıcı (ZWNJ)" style="font-family:inherit;font-size:12px">Ayır (ZWNJ)</button>
+      <span id="progress"></span>
+    </div>
+  </header>
+
+  <main id="grid"></main>
+
+  <script>
+    const STORAGE_KEY = 'elifba_letter_forms_v1';
+    const POS = [['initial', 'Başta'], ['medial', 'Ortada'], ['final', 'Sonda']];
+    const ROWS = ['Üstün', 'Esre', 'Ötre'];
+    const NON_JOINING = 'ادذرزو';
+    const LETTERS = [
+      ['ا','Elif'],['ب','Be'],['ت','Te'],['ث','Se'],['ج','Cim'],['ح','Ha'],['خ','Hı'],['د','Dal'],['ذ','Zel'],['ر','Rı'],
+      ['ز','Ze'],['س','Sin'],['ش','Şın'],['ص','Sad'],['ض','Dad'],['ط','Tı'],['ظ','Zı'],['ع','Ayın'],['غ','Gayın'],['ف','Fe'],
+      ['ق','Kaf'],['ك','Kef'],['ل','Lam'],['م','Mim'],['ن','Nun'],['و','Vav'],['ه','He'],['لا','Lamelif'],['ي','Ye']
+    ];
+
+    let store = {};
+    try { store = JSON.parse(localStorage.getItem(STORAGE_KEY)) || {}; } catch (e) { store = {}; }
+
+    function persist() {
+      try { localStorage.setItem(STORAGE_KEY, JSON.stringify(store)); } catch (e) {}
+    }
+
+    function getVal(letter, pos, row) {
+      return (store[letter] && store[letter][pos] && store[letter][pos][row]) || '';
+    }
+
+    function setVal(letter, pos, row, value) {
+      if (!store[letter]) store[letter] = { initial: ['', '', ''], medial: ['', '', ''], final: ['', '', ''] };
+      store[letter][pos][row] = value;
+      persist();
+    }
+
+    function updateProgress() {
+      const filled = document.querySelectorAll('input.cell.filled').length;
+      document.getElementById('progress').textContent = `${filled} / ${LETTERS.length * 9} yazılış girildi`;
+    }
+
+    function build() {
+      const grid = document.getElementById('grid');
+      grid.innerHTML = '';
+      LETTERS.forEach(([letter, name], i) => {
+        const card = document.createElement('section');
+        card.className = 'card';
+        card.innerHTML = `<h2><span class="big">${letter}</span><span>${i + 1}. ${name}</span>` +
+          (NON_JOINING.includes(letter) ? '<span class="warn">sonrakine bitişmez</span>' : '') + '</h2>';
+        const table = document.createElement('table');
+        table.innerHTML = '<thead><tr><th></th>' + POS.map(p => `<th>${p[1]}</th>`).join('') + '</tr></thead>';
+        const tbody = document.createElement('tbody');
+        ROWS.forEach((rowName, row) => {
+          const tr = document.createElement('tr');
+          tr.innerHTML = `<th>${rowName}</th>`;
+          POS.forEach(([pos]) => {
+            const td = document.createElement('td');
+            const input = document.createElement('input');
+            input.type = 'text';
+            input.dir = 'rtl';
+            input.className = 'cell';
+            input.value = getVal(letter, pos, row);
+            input.classList.toggle('filled', input.value.trim() !== '');
+            input.addEventListener('input', () => {
+              setVal(letter, pos, row, input.value);
+              input.classList.toggle('filled', input.value.trim() !== '');
+              updateProgress();
+            });
+            td.appendChild(input);
+            tr.appendChild(td);
+          });
+          tbody.appendChild(tr);
+        });
+        table.appendChild(tbody);
+        card.appendChild(table);
+        grid.appendChild(card);
+      });
+      updateProgress();
+    }
+
+    // Son odaklanılan kutuya hareke / birleştirici ekle
+    let lastInput = null;
+    document.addEventListener('focusin', e => {
+      if (e.target.classList && e.target.classList.contains('cell')) lastInput = e.target;
+    });
+    function insertMark(ch) {
+      if (!lastInput) return;
+      const s = lastInput.selectionStart ?? lastInput.value.length;
+      const e = lastInput.selectionEnd ?? s;
+      lastInput.value = lastInput.value.slice(0, s) + ch + lastInput.value.slice(e);
+      lastInput.setSelectionRange(s + ch.length, s + ch.length);
+      lastInput.focus();
+      lastInput.dispatchEvent(new Event('input'));
+    }
+
+    function exportForms() {
+      const data = 'data:text/json;charset=utf-8,' + encodeURIComponent(JSON.stringify(store, null, 2));
+      const a = document.createElement('a');
+      a.href = data;
+      a.download = 'harf_yazilislari.json';
+      document.body.appendChild(a);
+      a.click();
+      a.remove();
+    }
+
+    function importForms(event) {
+      const file = event.target.files[0];
+      if (!file) return;
+      const reader = new FileReader();
+      reader.onload = () => {
+        try {
+          const data = JSON.parse(reader.result);
+          if (!data || typeof data !== 'object' || Array.isArray(data)) throw new Error('Geçersiz biçim');
+          if (!confirm('Mevcut girişlerin yerine bu dosyadaki veri yüklenecek. Devam edilsin mi?')) return;
+          store = data;
+          persist();
+          build();
+        } catch (err) {
+          alert('Dosya yüklenemedi: ' + err.message);
+        } finally {
+          event.target.value = '';
+        }
+      };
+      reader.readAsText(file);
+    }
+
+    build();
+  </script>
+</body>
+</html>

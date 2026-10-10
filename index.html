@@ -103,7 +103,10 @@
           </div>
           <div class="flex flex-col">
             <span class="font-title font-bold text-base text-primary leading-none">Elifba Kids</span>
-            <span class="font-title text-xs text-on-surface-variant leading-none mt-1">1. Bölüm: Tekne Kardeşler</span>
+            <select id="chapterPicker" onchange="changeChapter(this.value)"
+                    class="font-title text-xs text-on-surface-variant leading-none mt-1 bg-transparent border-none p-0 focus:outline-none cursor-pointer max-w-[190px]">
+              <option value="default">1. Bölüm: Tekne Kardeşler</option>
+            </select>
           </div>
         </div>
 
@@ -199,6 +202,49 @@
             </div>
           </div>
 
+          <!-- Harfin Yazılış Şekilleri -->
+          <div id="formsStrip" class="w-full max-w-[320px] mt-3 grid grid-cols-4 gap-1.5 text-center" dir="ltr">
+            <div class="rounded-xl bg-surface-container-low py-1.5">
+              <div id="formIsolated" class="font-arabic text-3xl text-tertiary leading-tight"></div>
+              <div class="font-title text-[10px] font-bold text-on-surface-variant">Tek</div>
+            </div>
+            <div class="rounded-xl bg-surface-container-low py-1.5">
+              <div id="formInitial" class="font-arabic text-3xl text-tertiary leading-tight"></div>
+              <div class="font-title text-[10px] font-bold text-on-surface-variant">Başta</div>
+            </div>
+            <div class="rounded-xl bg-surface-container-low py-1.5">
+              <div id="formMedial" class="font-arabic text-3xl text-tertiary leading-tight"></div>
+              <div class="font-title text-[10px] font-bold text-on-surface-variant">Ortada</div>
+            </div>
+            <div class="rounded-xl bg-surface-container-low py-1.5">
+              <div id="formFinal" class="font-arabic text-3xl text-tertiary leading-tight"></div>
+              <div class="font-title text-[10px] font-bold text-on-surface-variant">Sonda</div>
+            </div>
+          </div>
+
+          <!-- Harekeli 9 Yazılış (Başta / Ortada / Sonda x Üstün / Esre / Ötre) -->
+          <div id="voweledPanel" class="hidden w-full max-w-[320px] mt-3">
+            <div id="letterChips" class="flex flex-wrap justify-center gap-1.5 mb-2"></div>
+            <div class="grid grid-cols-4 gap-1.5 text-center items-center" dir="ltr">
+              <div></div>
+              <div class="font-title text-[10px] font-bold text-on-surface-variant">Başta</div>
+              <div class="font-title text-[10px] font-bold text-on-surface-variant">Ortada</div>
+              <div class="font-title text-[10px] font-bold text-on-surface-variant">Sonda</div>
+              <div class="font-title text-[10px] font-bold text-on-surface-variant">Üstün</div>
+              <div id="v-initial-0" class="font-arabic text-3xl text-tertiary rounded-xl bg-surface-container-low py-1 leading-tight"></div>
+              <div id="v-medial-0" class="font-arabic text-3xl text-tertiary rounded-xl bg-surface-container-low py-1 leading-tight"></div>
+              <div id="v-final-0" class="font-arabic text-3xl text-tertiary rounded-xl bg-surface-container-low py-1 leading-tight"></div>
+              <div class="font-title text-[10px] font-bold text-on-surface-variant">Esre</div>
+              <div id="v-initial-1" class="font-arabic text-3xl text-tertiary rounded-xl bg-surface-container-low py-1 leading-tight"></div>
+              <div id="v-medial-1" class="font-arabic text-3xl text-tertiary rounded-xl bg-surface-container-low py-1 leading-tight"></div>
+              <div id="v-final-1" class="font-arabic text-3xl text-tertiary rounded-xl bg-surface-container-low py-1 leading-tight"></div>
+              <div class="font-title text-[10px] font-bold text-on-surface-variant">Ötre</div>
+              <div id="v-initial-2" class="font-arabic text-3xl text-tertiary rounded-xl bg-surface-container-low py-1 leading-tight"></div>
+              <div id="v-medial-2" class="font-arabic text-3xl text-tertiary rounded-xl bg-surface-container-low py-1 leading-tight"></div>
+              <div id="v-final-2" class="font-arabic text-3xl text-tertiary rounded-xl bg-surface-container-low py-1 leading-tight"></div>
+            </div>
+          </div>
+
           <!-- Harfi Dinle Butonu -->
           <button id="listenAudioBtn" 
                   onclick="playCurrentLetterSound()"
@@ -277,49 +323,14 @@
       <!-- 1. Bölümün 4 Harfi (Navigasyon Podları) -->
       <div class="w-full mt-6 pt-2 flex flex-col items-center">
         <div class="flex items-center justify-between w-full mb-2 px-1">
-          <span class="font-title font-bold text-xs text-on-surface-variant">1. Bölümün Harfleri (Tekne Kardeşler):</span>
+          <span id="podsTitle" class="font-title font-bold text-xs text-on-surface-variant">1. Bölümün Harfleri (Tekne Kardeşler):</span>
           <span id="badgeComplete" class="hidden font-title font-bold text-xs text-emerald-600 flex items-center gap-1">
             Tamamlandı 🎉
           </span>
         </div>
 
-        <div class="grid grid-cols-4 gap-2 w-full">
-          <!-- Elif -->
-          <div onclick="selectLetterByIndex(0)" id="pill-0" class="bg-surface-container-lowest rounded-2xl p-2 flex flex-col items-center justify-center shadow-md relative border-2 border-primary cursor-pointer">
-            <div id="tag-0" class="absolute -top-2 bg-primary text-on-primary font-title font-bold text-[9px] px-1.5 py-0.2 rounded-full">
-              Şimdi
-            </div>
-            <span class="font-title font-bold text-[11px] text-primary mt-1">Elif</span>
-            <span class="font-arabic text-2xl text-tertiary leading-tight mt-0.5">ا</span>
-          </div>
-
-          <!-- Be -->
-          <div onclick="selectLetterByIndex(1)" id="pill-1" class="bg-surface-container rounded-2xl p-2 flex flex-col items-center justify-center cursor-pointer transition-transform hover:scale-105 active:scale-95 shadow-xs">
-            <div id="tag-1" class="hidden absolute -top-2 bg-primary text-on-primary font-title font-bold text-[9px] px-1.5 py-0.2 rounded-full">
-              Şimdi
-            </div>
-            <span class="font-title font-bold text-[11px] text-on-surface-variant mt-1">Be</span>
-            <span class="font-arabic text-2xl text-on-surface leading-tight mt-0.5">ب</span>
-          </div>
-
-          <!-- Te -->
-          <div onclick="selectLetterByIndex(2)" id="pill-2" class="bg-surface-container rounded-2xl p-2 flex flex-col items-center justify-center cursor-pointer transition-transform hover:scale-105 active:scale-95 shadow-xs">
-            <div id="tag-2" class="hidden absolute -top-2 bg-primary text-on-primary font-title font-bold text-[9px] px-1.5 py-0.2 rounded-full">
-              Şimdi
-            </div>
-            <span class="font-title font-bold text-[11px] text-on-surface-variant mt-1">Te</span>
-            <span class="font-arabic text-2xl text-on-surface leading-tight mt-0.5">ت</span>
-          </div>
-
-          <!-- Se -->
-          <div onclick="selectLetterByIndex(3)" id="pill-3" class="bg-surface-container rounded-2xl p-2 flex flex-col items-center justify-center cursor-pointer transition-transform hover:scale-105 active:scale-95 shadow-xs">
-            <div id="tag-3" class="hidden absolute -top-2 bg-primary text-on-primary font-title font-bold text-[9px] px-1.5 py-0.2 rounded-full">
-              Şimdi
-            </div>
-            <span class="font-title font-bold text-[11px] text-on-surface-variant mt-1">Se</span>
-            <span class="font-arabic text-2xl text-on-surface leading-tight mt-0.5">ث</span>
-          </div>
-        </div>
+        <!-- Pod'lar JS ile doldurulur -->
+        <div id="pillGrid" class="grid grid-cols-4 gap-2 w-full"></div>
       </div>
 
     </div>
@@ -332,12 +343,12 @@
         🏆
       </div>
       <h3 class="font-title font-bold text-2xl text-slate-800">Tebrikler Minik Hafız!</h3>
-      <p class="font-title text-amber-500 font-bold text-lg my-1">1. Bölümü Tamamladın!</p>
-      <p class="font-body text-xs text-slate-600 px-2 my-2 leading-relaxed">
+      <p id="modalTitle" class="font-title text-amber-500 font-bold text-lg my-1">1. Bölümü Tamamladın!</p>
+      <p id="modalText" class="font-body text-xs text-slate-600 px-2 my-2 leading-relaxed">
         'Elif, Be, Te ve Se' harflerinin hepsini başarıyla öğrendin ve okudun! 40 Yıldız kazandın!
       </p>
       <div class="bg-amber-50 border border-amber-200 rounded-2xl px-5 py-2 my-2 flex items-center gap-2">
-        <span class="text-amber-500 font-title font-bold text-base">⭐ +40 Yıldız Toplandı</span>
+        <span id="modalStars" class="text-amber-500 font-title font-bold text-base">⭐ +40 Yıldız Toplandı</span>
       </div>
       <button onclick="closeCompletionModal()" class="w-full py-3.5 bg-emerald-500 text-white font-title font-bold rounded-2xl mt-3 shadow-md hover:bg-emerald-600 active:scale-98 transition-all">
         Harika! Tekrar Oyna 🔄
@@ -369,7 +380,7 @@
 
   <!-- CANLI MOTOR: 1. BÖLÜMÜN 4 HARF AKIŞI -->
   <script>
-    const lesson1Letters = [
+    const defaultLetters = [
       {
         id: 'elif',
         name: 'Elif',
@@ -412,6 +423,236 @@
       }
     ];
 
+    // --- Admin panelinden gelen müfredat ---
+    const CURRICULUM_KEY = 'elifba_curriculum_v2';
+    const CURRICULUM_FILE = 'data/elifba_mufredat_tam.json';
+    let curriculum = {};          // { ch1: [...], ch2: [...] }
+    let lessonItems = defaultLetters;
+    let currentChapter = 'default';
+
+    function chapterLabel(key) {
+      const n = key.replace(/^ch/, '');
+      return n === '1' ? 'Chapter 1: 28 Harfi Tanıma'
+           : n === '2' ? 'Chapter 2: Elifba 1. Bölüm'
+           : `Chapter ${n}`;
+    }
+
+    // Admin kaydını çocuk ekranının kullandığı biçime çevirir
+    function itemFromAdmin(entry, index) {
+      const arabic = entry.arabic || '';
+      return {
+        id: `item-${index}`,
+        name: entry.transliteration || arabic,
+        symbol: arabic,
+        phonics: entry.transliteration ? `[ ${entry.transliteration} ]` : '',
+        tag: entry.type === 'quiz' ? 'Sınav' : 'Ders',
+        hint: entry.hint || 'Tane tane oku!',
+        hudhud: entry.hint || 'Tane tane oku!',
+        speechWord: arabic.replace(/[‌‍]/g, ''),
+        forms: entry.forms || null
+      };
+    }
+
+    function parseCurriculum(raw) {
+      try {
+        const data = JSON.parse(raw);
+        if (data && typeof data === 'object' && !Array.isArray(data)) return data;
+      } catch (e) { /* bozuk veri: yok say */ }
+      return null;
+    }
+
+    async function loadCurriculum() {
+      let data = null;
+      try {
+        data = parseCurriculum(localStorage.getItem(CURRICULUM_KEY));
+      } catch (e) { /* localStorage erişilemez */ }
+      if (!data || Object.keys(data).length === 0) {
+        try {
+          const res = await fetch(CURRICULUM_FILE, { cache: 'no-store' });
+          if (res.ok) data = parseCurriculum(await res.text());
+        } catch (e) { /* dosya yok / file:// açık */ }
+      }
+      curriculum = data || {};
+
+      const picker = document.getElementById('chapterPicker');
+      Object.keys(curriculum)
+        .filter(k => Array.isArray(curriculum[k]) && curriculum[k].length > 0)
+        .sort((a, b) => parseInt(a.replace(/\D/g, ''), 10) - parseInt(b.replace(/\D/g, ''), 10))
+        .forEach(k => {
+          const opt = document.createElement('option');
+          opt.value = k;
+          opt.textContent = `${chapterLabel(k)} (${curriculum[k].length})`;
+          picker.appendChild(opt);
+        });
+    }
+
+    function changeChapter(key) {
+      if (isRecording) stopRealRecording(false);
+      currentChapter = key;
+      lessonItems = key === 'default'
+        ? defaultLetters
+        : (curriculum[key] || []).map(itemFromAdmin);
+      currentIndex = 0;
+      completedIndexes.clear();
+      totalStars = 0;
+      document.getElementById('starsCount').textContent = '0';
+      document.getElementById('podsTitle').textContent = key === 'default'
+        ? '1. Bölümün Harfleri (Tekne Kardeşler):'
+        : `${chapterLabel(key)} içeriği:`;
+      buildPills();
+      renderCurrentLetter();
+    }
+
+    function buildPills() {
+      const grid = document.getElementById('pillGrid');
+      grid.innerHTML = '';
+      lessonItems.forEach((item, i) => {
+        const pill = document.createElement('div');
+        pill.id = `pill-${i}`;
+        pill.onclick = () => selectLetterByIndex(i);
+        const tag = document.createElement('div');
+        tag.id = `tag-${i}`;
+        tag.className = 'hidden absolute -top-2 bg-primary text-on-primary font-title font-bold text-[9px] px-1.5 py-0.2 rounded-full';
+        tag.textContent = 'Şimdi';
+        const name = document.createElement('span');
+        name.className = 'font-title font-bold text-[11px] text-on-surface-variant mt-1 truncate max-w-full';
+        name.textContent = item.name;
+        const sym = document.createElement('span');
+        sym.className = 'font-arabic text-2xl text-on-surface leading-tight mt-0.5';
+        sym.textContent = item.symbol;
+        pill.append(tag, name, sym);
+        grid.appendChild(pill);
+      });
+    }
+
+    // 9 yazılış: başta/ortada/sonda x üstün/esre/ötre
+    const VOWEL_MARKS = ['َ', 'ِ', 'ُ'];
+    const BASE_LETTER_RE = /[ء-غف-ي]/;
+
+    // Harf Yazılış Girişi sayfasında elle yazılan yazılışlar
+    const LETTER_FORMS_KEY = 'elifba_letter_forms_v1';
+    const LETTER_FORMS_FILE = 'data/harf_yazilislari.json';
+    let letterForms = {};
+
+    function hasForms(f) {
+      return !!f && ['initial', 'medial', 'final'].some(p => Array.isArray(f[p]) && f[p].some(v => v && v.trim()));
+    }
+
+    async function loadLetterForms() {
+      let data = null;
+      try { data = parseCurriculum(localStorage.getItem(LETTER_FORMS_KEY)); } catch (e) {}
+      const hasAny = d => d && Object.values(d).some(hasForms);
+      if (!hasAny(data)) {
+        try {
+          const res = await fetch(LETTER_FORMS_FILE, { cache: 'no-store' });
+          if (res.ok) data = parseCurriculum(await res.text());
+        } catch (e) { /* dosya yok */ }
+      }
+      letterForms = hasAny(data) ? data : {};
+    }
+
+    function renderVoweled(letter) {
+      const saved = letterForms[letter];
+      if (hasForms(saved)) {
+        for (let row = 0; row < 3; row++) {
+          ['initial', 'medial', 'final'].forEach(pos => {
+            document.getElementById(`v-${pos}-${row}`).textContent = (saved[pos] && saved[pos][row]) || '';
+          });
+        }
+        return;
+      }
+      VOWEL_MARKS.forEach((mark, row) => {
+        document.getElementById(`v-initial-${row}`).textContent = '‌' + letter + mark + '‍';
+        document.getElementById(`v-medial-${row}`).textContent = '‍' + letter + mark + '‍';
+        document.getElementById(`v-final-${row}`).textContent = '‍' + letter + mark;
+      });
+    }
+
+    function lettersOf(text) {
+      const chars = Array.from(text.replace(/[‌‍]/g, ''));
+      const out = [];
+      chars.forEach((c, i) => {
+        if (!BASE_LETTER_RE.test(c)) return;
+        const l = (c === 'ا' && chars[i - 1] === 'ل') ? 'لا' : c;
+        if (l === 'لا') { const li = out.lastIndexOf('ل'); if (li >= 0 && li === out.length - 1) out.pop(); }
+        if (!out.includes(l)) out.push(l);
+      });
+      return out;
+    }
+
+    function showVoweled(item) {
+      const panel = document.getElementById('voweledPanel');
+      const chips = document.getElementById('letterChips');
+
+      // Admin'de elle yazılmış 9 yazılış varsa onu göster
+      const manual = item.forms && item.forms.voweled;
+      if (manual) {
+        chips.innerHTML = '';
+        for (let row = 0; row < 3; row++) {
+          ['initial', 'medial', 'final'].forEach(pos => {
+            document.getElementById(`v-${pos}-${row}`).textContent = (manual[pos] && manual[pos][row]) || '';
+          });
+        }
+        panel.classList.remove('hidden');
+        return;
+      }
+
+      const letters = lettersOf(item.symbol);
+      if (letters.length === 0) { panel.classList.add('hidden'); return; }
+
+      const preferred = item.forms && item.forms.letter && letters.includes(item.forms.letter)
+        ? item.forms.letter : letters[0];
+      chips.innerHTML = '';
+      const select = (l) => {
+        renderVoweled(l);
+        chips.querySelectorAll('button').forEach(b => {
+          const on = b.dataset.letter === l;
+          b.classList.toggle('bg-primary', on);
+          b.classList.toggle('text-on-primary', on);
+          b.classList.toggle('bg-surface-container', !on);
+        });
+      };
+      if (letters.length > 1) {
+        letters.forEach(l => {
+          const b = document.createElement('button');
+          b.type = 'button';
+          b.dataset.letter = l;
+          b.textContent = l;
+          b.className = 'font-arabic text-xl w-9 h-9 rounded-full shadow-xs text-on-surface-variant';
+          b.onclick = () => select(l);
+          chips.appendChild(b);
+        });
+      }
+      select(preferred);
+      panel.classList.remove('hidden');
+    }
+
+    function showForms(item) {
+      const strip = document.getElementById('formsStrip');
+      const panel = document.getElementById('voweledPanel');
+      if (currentChapter !== 'default') {
+        strip.classList.add('hidden');
+        showVoweled(item);
+        return;
+      }
+      panel.classList.add('hidden');
+      let f = item.forms;
+      if (!f) {
+        // Tek harfse otomatik hesapla; kelimelerde şerit gizlenir
+        const plain = item.symbol.replace(/[ً-ٰٗ‌‍]/g, '');
+        if (Array.from(plain).length !== 1 && plain !== 'لا') { strip.classList.add('hidden'); return; }
+        f = { isolated: item.symbol,
+              initial: '‌' + item.symbol + '‍',
+              medial: '‍' + item.symbol + '‍',
+              final: '‍' + item.symbol };
+      }
+      strip.classList.remove('hidden');
+      document.getElementById('formIsolated').textContent = f.isolated;
+      document.getElementById('formInitial').textContent = f.initial;
+      document.getElementById('formMedial').textContent = f.medial;
+      document.getElementById('formFinal').textContent = f.final;
+    }
+
     let currentIndex = 0;
     let completedIndexes = new Set();
     let totalStars = 0;
@@ -422,24 +663,29 @@
     let animationFrameId = null;
 
     function renderCurrentLetter() {
-      const data = lesson1Letters[currentIndex];
-      
+      const total = lessonItems.length;
+      const data = lessonItems[currentIndex];
+      const isDefault = currentChapter === 'default';
+
       document.getElementById('arabicSymbol').textContent = data.symbol;
+      showForms(data);
       document.getElementById('letterName').textContent = data.name;
       document.getElementById('phonicsHelper').textContent = data.phonics;
       document.getElementById('letterTypeTag').textContent = data.tag;
       document.getElementById('childHintText').textContent = data.hint;
-      document.getElementById('hudhudSpeech').innerHTML = `“${data.hudhud}” 🪶✨`;
-      document.getElementById('levelBadge').textContent = `Adım ${currentIndex + 1}/4`;
-      document.getElementById('lessonTag').textContent = `${currentIndex + 1}. Harf • Tekne Kardeşler`;
-      
+      document.getElementById('hudhudSpeech').textContent = `“${data.hudhud}” 🪶✨`;
+      document.getElementById('levelBadge').textContent = `Adım ${currentIndex + 1}/${total}`;
+      document.getElementById('lessonTag').textContent = isDefault
+        ? `${currentIndex + 1}. Harf • Tekne Kardeşler`
+        : `${currentIndex + 1}. Alıştırma • ${chapterLabel(currentChapter)}`;
+
       // İlerleme Çubuğu Güncellemesi
-      const progressPercent = ((currentIndex + 1) / 4) * 100;
+      const progressPercent = ((currentIndex + 1) / total) * 100;
       document.getElementById('progressBar').style.width = `${progressPercent}%`;
-      document.getElementById('progressText').textContent = `${currentIndex + 1}/4`;
+      document.getElementById('progressText').textContent = `${currentIndex + 1}/${total}`;
 
       // Alt navigasyon butonlarının durumları
-      for (let i = 0; i < 4; i++) {
+      for (let i = 0; i < total; i++) {
         const pill = document.getElementById(`pill-${i}`);
         const tag = document.getElementById(`tag-${i}`);
         
@@ -468,7 +714,7 @@
     }
 
     function playCurrentLetterSound() {
-      const data = lesson1Letters[currentIndex];
+      const data = lessonItems[currentIndex];
       const pod = document.getElementById('letterPod');
       pod.classList.add('bg-secondary-fixed/40');
       setTimeout(() => pod.classList.remove('bg-secondary-fixed/40'), 600);
@@ -585,7 +831,7 @@
 
       if (isSuccess) {
         toast.className = 'absolute -bottom-14 left-0 right-0 mx-auto w-11/12 bg-tertiary text-on-tertiary px-4 py-2.5 rounded-full flex items-center justify-between shadow-xl z-30 transition-all duration-300';
-        toastMsg.textContent = `Maşallah! '${lesson1Letters[currentIndex].name}' harfini çok güzel okudun! 🌟`;
+        toastMsg.textContent = `Maşallah! '${lessonItems[currentIndex].name}' çok güzel okudun! 🌟`;
         
         totalStars += 10;
         starsCount.textContent = totalStars;
@@ -593,12 +839,19 @@
 
         // Bir sonraki harfe geç veya Bölümü bitir
         setTimeout(() => {
-          if (completedIndexes.size === 4) {
-            // 4 harfin hepsi bitti! Kupa modalı açılsın
+          if (completedIndexes.size === lessonItems.length) {
+            // Hepsi bitti! Kupa modalı açılsın
+            const count = lessonItems.length;
+            document.getElementById('modalTitle').textContent = currentChapter === 'default'
+              ? '1. Bölümü Tamamladın!'
+              : `${chapterLabel(currentChapter)} Tamamlandı!`;
+            document.getElementById('modalText').textContent =
+              `${count} alıştırmanın hepsini başarıyla okudun! ${count * 10} Yıldız kazandın!`;
+            document.getElementById('modalStars').textContent = `⭐ +${count * 10} Yıldız Toplandı`;
             document.getElementById('completionModal').classList.remove('hidden');
           } else {
             // Sonraki harfe ilerle
-            currentIndex = (currentIndex + 1) % 4;
+            currentIndex = (currentIndex + 1) % lessonItems.length;
             renderCurrentLetter();
             playCurrentLetterSound();
           }
@@ -623,7 +876,9 @@
     }
 
     // İlk yükleme
+    buildPills();
     renderCurrentLetter();
+    Promise.all([loadCurriculum(), loadLetterForms()]).then(() => renderCurrentLetter());
   </script>
 </body>
 </html>
