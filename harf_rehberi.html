@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8"/>
   <meta content="width=device-width, initial-scale=1.0" name="viewport"/>
-  <title>Harf Yazılış Girişi (29 harf x 9 yazılış)</title>
+  <title>Harf Yazılış Girişi (29 harf x 15 yazılış)</title>
   <link href="https://fonts.googleapis.com" rel="preconnect"/>
   <link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect"/>
   <link href="https://fonts.googleapis.com/css2?family=Amiri:wght@400;700&family=Nunito+Sans:wght@500;700&display=swap" rel="stylesheet"/>
@@ -28,6 +28,9 @@
     .card h2 { margin: 0 0 8px; display: flex; align-items: baseline; gap: 10px; font-size: 13px; color: #64748b; }
     .card h2 .big { font-family: 'Amiri', serif; font-size: 34px; color: #0c4a6e; line-height: 1; }
     .card h2 .warn { margin-left: auto; font-size: 10px; color: #b45309; background: #fef3c7; padding: 2px 8px; border-radius: 999px; }
+    .card > table { margin-bottom: 10px; }
+    .extra { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
+    .extra table { border-spacing: 4px; }
     table { width: 100%; border-collapse: separate; border-spacing: 4px; text-align: center; }
     th { font-size: 10px; color: #64748b; font-weight: 700; }
     input.cell { width: 100%; font-family: 'Amiri', serif; font-size: 28px; text-align: center; color: #0c4a6e;
@@ -41,7 +44,7 @@
     <div class="top">
       <div>
         <h1>Harf Yazılış Girişi</h1>
-        <p>29 harf × 9 yazılış (Başta / Ortada / Sonda × Üstün / Esre / Ötre). Kutular boştur; yazılışları siz girersiniz. Otomatik kaydedilir.</p>
+        <p>29 harf × 15 kutu (Başta / Ortada / Sonda × Üstün / Esre / Ötre = 9, Med × 3, Tenvin × 3). Kutularda yalnızca harfin yerleşimi var; harekeleri siz eklersiniz. Otomatik kaydedilir.</p>
       </div>
       <div class="actions">
         <button class="btn green" onclick="exportForms()">JSON İndir</button>
@@ -55,6 +58,9 @@
       <button class="btn" onmousedown="event.preventDefault()" onclick="insertMark('َ')" title="Üstün">ـَ</button>
       <button class="btn" onmousedown="event.preventDefault()" onclick="insertMark('ِ')" title="Esre">ـِ</button>
       <button class="btn" onmousedown="event.preventDefault()" onclick="insertMark('ُ')" title="Ötre">ـُ</button>
+      <button class="btn" onmousedown="event.preventDefault()" onclick="insertMark('ً')" title="Üstün tenvin">ـً</button>
+      <button class="btn" onmousedown="event.preventDefault()" onclick="insertMark('ٍ')" title="Esre tenvin">ـٍ</button>
+      <button class="btn" onmousedown="event.preventDefault()" onclick="insertMark('ٌ')" title="Ötre tenvin">ـٌ</button>
       <button class="btn" onmousedown="event.preventDefault()" onclick="insertMark('‍')" title="Bitiştirici (ZWJ)" style="font-family:inherit;font-size:12px">Bitiştir (ZWJ)</button>
       <button class="btn" onmousedown="event.preventDefault()" onclick="insertMark('‌')" title="Ayırıcı (ZWNJ)" style="font-family:inherit;font-size:12px">Ayır (ZWNJ)</button>
       <span id="progress"></span>
@@ -67,6 +73,18 @@
     const STORAGE_KEY = 'elifba_letter_forms_v1';
     const POS = [['initial', 'Başta'], ['medial', 'Ortada'], ['final', 'Sonda']];
     const ROWS = ['Üstün', 'Esre', 'Ötre'];
+    const SINGLE = [['main', '']];
+    const MEDD_ROWS = ['Üstün med', 'Esre med', 'Ötre med'];
+    const TENVIN_ROWS = ['Üstün tenvin', 'Esre tenvin', 'Ötre tenvin'];
+    const TOTAL_PER_LETTER = POS.length * ROWS.length + MEDD_ROWS.length + TENVIN_ROWS.length; // 15
+    const ZWJ = '‍', ZWNJ = '‌';
+    // Harfin yerleşimi (hareke yok): hareke ve tenvin elle eklenir
+    function placement(letter, pos) {
+      if (pos === 'initial') return ZWNJ + letter + ZWJ;
+      if (pos === 'medial') return ZWJ + letter + ZWJ;
+      if (pos === 'final') return ZWJ + letter;
+      return letter; // main: tekil harf
+    }
     const NON_JOINING = 'ادذرزو';
     const LETTERS = [
       ['ا','Elif'],['ب','Be'],['ت','Te'],['ث','Se'],['ج','Cim'],['ح','Ha'],['خ','Hı'],['د','Dal'],['ذ','Zel'],['ر','Rı'],
@@ -81,22 +99,79 @@
       try { localStorage.setItem(STORAGE_KEY, JSON.stringify(store)); } catch (e) {}
     }
 
-    function getVal(letter, pos, row) {
-      return (store[letter] && store[letter][pos] && store[letter][pos][row]) || '';
+    // 'vowel' -> store[letter][pos][row]; 'medd' / 'tenvin' -> store[letter][group].main[row]
+    function bucket(letter, group, pos, create) {
+      let l = store[letter];
+      if (!l || typeof l !== 'object') { if (!create) return null; l = store[letter] = {}; }
+      let holder = l;
+      if (group !== 'vowel') {
+        if (!l[group] || typeof l[group] !== 'object') { if (!create) return null; l[group] = {}; }
+        holder = l[group];
+      }
+      if (!Array.isArray(holder[pos])) { if (!create) return null; holder[pos] = ['', '', '']; }
+      return holder[pos];
     }
 
-    function setVal(letter, pos, row, value) {
-      if (!store[letter]) store[letter] = { initial: ['', '', ''], medial: ['', '', ''], final: ['', '', ''] };
-      store[letter][pos][row] = value;
+    function getVal(letter, group, pos, row) {
+      const b = bucket(letter, group, pos, false);
+      return (b && b[row]) || '';
+    }
+
+    function setVal(letter, group, pos, row, value) {
+      bucket(letter, group, pos, true)[row] = value;
       persist();
+    }
+
+    // Eksik kutu gruplarını harf yerleşimiyle doldur (var olan girişlere dokunmaz)
+    function seedLetter(letter) {
+      const fill = (group, pos) => {
+        const had = bucket(letter, group, pos, false);
+        if (had) return;
+        const arr = bucket(letter, group, pos, true);
+        for (let r = 0; r < 3; r++) arr[r] = placement(letter, pos === 'main' ? 'main' : pos);
+      };
+      POS.forEach(([pos]) => fill('vowel', pos));
+      fill('medd', 'main');
+      fill('tenvin', 'main');
     }
 
     function updateProgress() {
       const filled = document.querySelectorAll('input.cell.filled').length;
-      document.getElementById('progress').textContent = `${filled} / ${LETTERS.length * 9} yazılış girildi`;
+      document.getElementById('progress').textContent = `${filled} / ${LETTERS.length * TOTAL_PER_LETTER} yazılış girildi`;
+    }
+
+    function makeTable(letter, group, positions, rowNames) {
+      const table = document.createElement('table');
+      table.innerHTML = '<thead><tr><th></th>' + positions.map(p => `<th>${p[1] || ''}</th>`).join('') + '</tr></thead>';
+      const tbody = document.createElement('tbody');
+      rowNames.forEach((rowName, row) => {
+        const tr = document.createElement('tr');
+        tr.innerHTML = `<th>${rowName}</th>`;
+        positions.forEach(([pos]) => {
+          const td = document.createElement('td');
+          const input = document.createElement('input');
+          input.type = 'text';
+          input.dir = 'rtl';
+          input.className = 'cell';
+          input.value = getVal(letter, group, pos, row);
+          input.classList.toggle('filled', input.value.trim() !== '');
+          input.addEventListener('input', () => {
+            setVal(letter, group, pos, row, input.value);
+            input.classList.toggle('filled', input.value.trim() !== '');
+            updateProgress();
+          });
+          td.appendChild(input);
+          tr.appendChild(td);
+        });
+        tbody.appendChild(tr);
+      });
+      table.appendChild(tbody);
+      return table;
     }
 
     function build() {
+      LETTERS.forEach(([letter]) => seedLetter(letter));
+      persist();
       const grid = document.getElementById('grid');
       grid.innerHTML = '';
       LETTERS.forEach(([letter, name], i) => {
@@ -104,32 +179,12 @@
         card.className = 'card';
         card.innerHTML = `<h2><span class="big">${letter}</span><span>${i + 1}. ${name}</span>` +
           (NON_JOINING.includes(letter) ? '<span class="warn">sonrakine bitişmez</span>' : '') + '</h2>';
-        const table = document.createElement('table');
-        table.innerHTML = '<thead><tr><th></th>' + POS.map(p => `<th>${p[1]}</th>`).join('') + '</tr></thead>';
-        const tbody = document.createElement('tbody');
-        ROWS.forEach((rowName, row) => {
-          const tr = document.createElement('tr');
-          tr.innerHTML = `<th>${rowName}</th>`;
-          POS.forEach(([pos]) => {
-            const td = document.createElement('td');
-            const input = document.createElement('input');
-            input.type = 'text';
-            input.dir = 'rtl';
-            input.className = 'cell';
-            input.value = getVal(letter, pos, row);
-            input.classList.toggle('filled', input.value.trim() !== '');
-            input.addEventListener('input', () => {
-              setVal(letter, pos, row, input.value);
-              input.classList.toggle('filled', input.value.trim() !== '');
-              updateProgress();
-            });
-            td.appendChild(input);
-            tr.appendChild(td);
-          });
-          tbody.appendChild(tr);
-        });
-        table.appendChild(tbody);
-        card.appendChild(table);
+        card.appendChild(makeTable(letter, 'vowel', POS, ROWS));
+        const extra = document.createElement('div');
+        extra.className = 'extra';
+        extra.appendChild(makeTable(letter, 'medd', SINGLE, MEDD_ROWS));
+        extra.appendChild(makeTable(letter, 'tenvin', SINGLE, TENVIN_ROWS));
+        card.appendChild(extra);
         grid.appendChild(card);
       });
       updateProgress();
