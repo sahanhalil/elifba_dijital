@@ -1,0 +1,273 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+  <meta charset="utf-8"/>
+  <meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+  <title>Harf Grupları Girişi (5 sıra)</title>
+  <link href="https://fonts.googleapis.com" rel="preconnect"/>
+  <link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect"/>
+  <link href="https://fonts.googleapis.com/css2?family=Amiri:wght@400;700&family=Nunito+Sans:wght@500;700&display=swap" rel="stylesheet"/>
+  <style>
+    * { box-sizing: border-box; }
+    body { margin: 0; font-family: 'Nunito Sans', sans-serif; background: #f1f5f9; color: #1e293b; }
+    header { background: #fff; border-bottom: 1px solid #e2e8f0; padding: 10px 20px; display: flex; align-items: center;
+             justify-content: space-between; gap: 12px; flex-wrap: wrap; }
+    h1 { font-size: 16px; margin: 0; }
+    header p { margin: 2px 0 0; font-size: 12px; color: #64748b; }
+    .actions { display: flex; gap: 6px; flex-wrap: wrap; align-items: center; }
+    .btn { font: inherit; font-size: 12px; font-weight: 700; border: 0; cursor: pointer;
+           padding: 7px 14px; border-radius: 12px; background: #e2e8f0; color: #334155; }
+    .btn.primary { background: #0284c7; color: #fff; }
+    .btn.danger { background: #ffe4e6; color: #be123c; }
+    #progress { font-size: 12px; font-weight: 700; color: #0f766e; }
+    main { padding: 16px 20px 0; }
+    .row { margin-bottom: 14px; }
+    .row h2 { margin: 0 0 6px; font-size: 12px; color: #64748b; }
+    .scroll { overflow-x: auto; padding-bottom: 6px; }
+    .cells { display: grid; gap: 6px; direction: rtl; width: max-content; }
+    .cell { position: relative; width: 72px; height: 64px; }
+    .cell input { width: 100%; height: 100%; border: 1.5px solid #cbd5e1; border-radius: 12px; background: #fff;
+                  font-family: 'Amiri', serif; font-size: 26px; text-align: center; padding: 14px 4px 0; color: #0c4a6e; }
+    .cell input:focus { outline: 0; border-color: #0284c7; box-shadow: 0 0 0 3px #bae6fd; }
+    .cell input.filled { background: #ecfdf5; border-color: #6ee7b7; }
+    .cell .num { position: absolute; top: 3px; right: 6px; font-size: 10px; font-weight: 700; color: #94a3b8;
+                 pointer-events: none; direction: ltr; }
+    .kb { position: sticky; bottom: 0; background: #fff; border-top: 1px solid #e2e8f0; padding: 10px 20px 14px;
+          box-shadow: 0 -4px 12px rgba(0,0,0,.05); }
+    .kb h3 { margin: 0 0 6px; font-size: 12px; color: #64748b; }
+    .keys { display: flex; flex-wrap: wrap; gap: 6px; margin-bottom: 8px; }
+    .key { font-family: 'Amiri', serif; font-size: 24px; min-width: 44px; height: 44px; border-radius: 12px;
+           border: 1px solid #e2e8f0; background: #fff; cursor: pointer; color: #1e293b; padding: 0 8px; }
+    .key:hover { background: #e0f2fe; }
+    .key:active { transform: scale(.94); }
+    .key.v { background: #fef3c7; border-color: #fde68a; }
+    .key.t { background: #d1fae5; border-color: #a7f3d0; }
+    .key.m { background: #e0e7ff; border-color: #c7d2fe; }
+    .key.ctl { font-family: 'Nunito Sans', sans-serif; font-size: 12px; font-weight: 700; background: #f1f5f9; }
+    .key small { display: block; font-family: 'Nunito Sans', sans-serif; font-size: 9px; color: #64748b; margin-top: -6px; }
+  </style>
+</head>
+<body>
+  <header>
+    <div>
+      <h1>Harf Grupları Girişi</h1>
+      <p>5 sıra: 1. sıra 15 kutu, 2-5. sıralar 27'şer kutu. Kutuya tıklayıp alttaki klavyeyle yazın. Otomatik kaydedilir.</p>
+    </div>
+    <div class="actions">
+      <span id="progress"></span>
+      <button class="btn primary" onclick="exportData()">JSON İndir</button>
+      <button class="btn" onclick="document.getElementById('file').click()">JSON Yükle</button>
+      <input id="file" type="file" accept=".json,application/json" hidden onchange="importData(event)"/>
+      <button class="btn danger" onclick="clearAll()">Hepsini Temizle</button>
+    </div>
+  </header>
+
+  <main id="rows"></main>
+
+  <section class="kb">
+    <h3>Arapça klavye (son tıklanan kutuya yazar)</h3>
+    <div class="keys" id="vowelKeys"></div>
+    <div class="keys" id="letterKeys"></div>
+  </section>
+
+  <script>
+    const STORAGE_KEY = 'elifba_letter_groups_v1';
+    const ROW_SIZES = [15, 27, 27, 27, 27];
+    const TOTAL = ROW_SIZES.reduce((a, b) => a + b, 0);
+
+    const VOWELS = [
+      ['َ', 'Üstün', 'v'], ['ِ', 'Esre', 'v'], ['ُ', 'Ötre', 'v'],
+      ['ْ', 'Cezm', 'v'], ['ّ', 'Şedde', 'v'],
+      ['ً', 'İki Üstün', 't'], ['ٍ', 'İki Esre', 't'], ['ٌ', 'İki Ötre', 't'],
+      ['ٰ', 'Elif Çeker', 'm'], ['ٖ', 'Ye Çeker', 'm'], ['ٗ', 'Vav Çeker', 'm'], ['ٓ', 'Medd', 'm']
+    ];
+    const LETTERS = ['ا','ب','ت','ث','ج','ح','خ','د','ذ','ر','ز','س','ش','ص','ض','ط','ظ','ع','غ','ف','ق','ك','ل','م','ن','و','ه','لا','ي','ء'];
+
+    let data = new Array(TOTAL).fill('');
+    try {
+      const saved = JSON.parse(localStorage.getItem(STORAGE_KEY));
+      if (Array.isArray(saved)) saved.slice(0, TOTAL).forEach((v, i) => { data[i] = typeof v === 'string' ? v : ''; });
+    } catch (e) { /* bozuk kayıt: boş başla */ }
+
+    function persist() {
+      try { localStorage.setItem(STORAGE_KEY, JSON.stringify(data)); } catch (e) {}
+    }
+
+    const inputs = [];
+    let lastInput = null;
+
+    function updateProgress() {
+      const filled = data.filter(v => v.trim() !== '').length;
+      document.getElementById('progress').textContent = `${filled} / ${TOTAL} kutu dolu`;
+    }
+
+    function build() {
+      const root = document.getElementById('rows');
+      let n = 0;
+      ROW_SIZES.forEach((size, r) => {
+        const row = document.createElement('div');
+        row.className = 'row';
+        row.innerHTML = `<h2>${r + 1}. Sıra (${size} kutu)</h2>`;
+        const scroll = document.createElement('div');
+        scroll.className = 'scroll';
+        const cells = document.createElement('div');
+        cells.className = 'cells';
+        cells.style.gridTemplateColumns = `repeat(${size}, 72px)`;
+        for (let i = 0; i < size; i++) {
+          const idx = n++;
+          const cell = document.createElement('div');
+          cell.className = 'cell';
+          const input = document.createElement('input');
+          input.type = 'text';
+          input.dir = 'rtl';
+          input.value = data[idx];
+          input.classList.toggle('filled', input.value.trim() !== '');
+          input.addEventListener('focus', () => { lastInput = input; });
+          input.addEventListener('input', () => {
+            data[idx] = input.value;
+            input.classList.toggle('filled', input.value.trim() !== '');
+            persist();
+            updateProgress();
+          });
+          const num = document.createElement('span');
+          num.className = 'num';
+          num.textContent = idx + 1;
+          cell.append(input, num);
+          cells.appendChild(cell);
+          inputs.push(input);
+        }
+        scroll.appendChild(cells);
+        row.appendChild(scroll);
+        root.appendChild(row);
+      });
+      updateProgress();
+    }
+
+    function insertText(text) {
+      const input = lastInput || inputs[0];
+      input.focus();
+      const s = input.selectionStart ?? input.value.length;
+      const e = input.selectionEnd ?? s;
+      input.value = input.value.slice(0, s) + text + input.value.slice(e);
+      input.setSelectionRange(s + text.length, s + text.length);
+      input.dispatchEvent(new Event('input'));
+    }
+
+    function backspace() {
+      const input = lastInput || inputs[0];
+      input.focus();
+      const s = input.selectionStart ?? input.value.length;
+      const e = input.selectionEnd ?? s;
+      if (s === e && s > 0) {
+        input.value = input.value.slice(0, s - 1) + input.value.slice(e);
+        input.setSelectionRange(s - 1, s - 1);
+      } else if (s !== e) {
+        input.value = input.value.slice(0, s) + input.value.slice(e);
+        input.setSelectionRange(s, s);
+      }
+      input.dispatchEvent(new Event('input'));
+    }
+
+    function clearCell() {
+      const input = lastInput || inputs[0];
+      input.value = '';
+      input.focus();
+      input.dispatchEvent(new Event('input'));
+    }
+
+    function buildKeyboard() {
+      const vk = document.getElementById('vowelKeys');
+      VOWELS.forEach(([ch, label, cls]) => {
+        const b = document.createElement('button');
+        b.type = 'button';
+        b.className = `key ${cls}`;
+        b.innerHTML = `◌${ch}<small>${label}</small>`;
+        b.onmousedown = e => e.preventDefault();
+        b.onclick = () => insertText(ch);
+        vk.appendChild(b);
+      });
+      const ctl = [
+        ['Bitişik (ZWJ)', () => insertText('‍')],
+        ['Ayrık (ZWNJ)', () => insertText('‌')],
+        ['Boşluk', () => insertText(' ')],
+        ['⌫ Sil', backspace],
+        ['Kutuyu Boşalt', clearCell]
+      ];
+      ctl.forEach(([label, fn]) => {
+        const b = document.createElement('button');
+        b.type = 'button';
+        b.className = 'key ctl';
+        b.textContent = label;
+        b.onmousedown = e => e.preventDefault();
+        b.onclick = fn;
+        vk.appendChild(b);
+      });
+
+      const lk = document.getElementById('letterKeys');
+      LETTERS.forEach(ch => {
+        const b = document.createElement('button');
+        b.type = 'button';
+        b.className = 'key';
+        b.textContent = ch;
+        b.onmousedown = e => e.preventDefault();
+        b.onclick = () => insertText(ch);
+        lk.appendChild(b);
+      });
+    }
+
+    function exportData() {
+      const rows = [];
+      let n = 0;
+      ROW_SIZES.forEach(size => { rows.push(data.slice(n, n + size)); n += size; });
+      const url = 'data:text/json;charset=utf-8,' + encodeURIComponent(JSON.stringify({ rows }, null, 2));
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = 'harf_gruplari.json';
+      document.body.appendChild(a);
+      a.click();
+      a.remove();
+    }
+
+    function importData(event) {
+      const file = event.target.files[0];
+      if (!file) return;
+      const reader = new FileReader();
+      reader.onload = () => {
+        try {
+          const parsed = JSON.parse(reader.result);
+          if (!parsed || !Array.isArray(parsed.rows)) throw new Error('Geçersiz biçim');
+          if (!confirm('Mevcut girişlerin yerine bu dosyadaki veri yüklenecek. Devam edilsin mi?')) return;
+          const flat = [];
+          ROW_SIZES.forEach((size, r) => {
+            const row = Array.isArray(parsed.rows[r]) ? parsed.rows[r] : [];
+            for (let i = 0; i < size; i++) flat.push(typeof row[i] === 'string' ? row[i] : '');
+          });
+          data = flat;
+          persist();
+          flat.forEach((v, i) => {
+            inputs[i].value = v;
+            inputs[i].classList.toggle('filled', v.trim() !== '');
+          });
+          updateProgress();
+        } catch (err) {
+          alert('Dosya yüklenemedi: ' + err.message);
+        } finally {
+          event.target.value = '';
+        }
+      };
+      reader.readAsText(file);
+    }
+
+    function clearAll() {
+      if (!confirm('Tüm kutular boşaltılsın mı?')) return;
+      data = new Array(TOTAL).fill('');
+      persist();
+      inputs.forEach(i => { i.value = ''; i.classList.remove('filled'); });
+      updateProgress();
+    }
+
+    build();
+    buildKeyboard();
+  </script>
+</body>
+</html>
