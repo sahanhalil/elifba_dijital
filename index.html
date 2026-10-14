@@ -492,10 +492,7 @@
       lessonItems = key === 'default'
         ? defaultLetters
         : (curriculum[key] || []).map(itemFromAdmin);
-      currentIndex = 0;
-      completedIndexes.clear();
-      totalStars = 0;
-      document.getElementById('starsCount').textContent = '0';
+      loadProgress();
       document.getElementById('podsTitle').textContent = key === 'default'
         ? '1. Bölümün Harfleri (Tekne Kardeşler):'
         : `${chapterLabel(key)} içeriği:`;
@@ -656,6 +653,40 @@
     let currentIndex = 0;
     let completedIndexes = new Set();
     let totalStars = 0;
+
+    // Çocuğun ilerlemesi: { chapterKey: [tamamlanan indeksler] }
+    const PROGRESS_KEY = 'elifba_progress_v1';
+
+    function readProgress() {
+      try {
+        const p = JSON.parse(localStorage.getItem(PROGRESS_KEY));
+        if (p && typeof p === 'object' && !Array.isArray(p)) return p;
+      } catch (e) { /* bozuk veri ya da localStorage kapalı */ }
+      return {};
+    }
+
+    function saveProgress() {
+      try {
+        const p = readProgress();
+        p[currentChapter] = [...completedIndexes];
+        localStorage.setItem(PROGRESS_KEY, JSON.stringify(p));
+      } catch (e) { /* kaydedilemezse oturum içinde devam eder */ }
+    }
+
+    // Geçerli bölümün kaydını yükler; yıldızlar tamamlanan x 10
+    function loadProgress() {
+      const saved = readProgress()[currentChapter];
+      completedIndexes = new Set(
+        Array.isArray(saved)
+          ? saved.filter(i => Number.isInteger(i) && i >= 0 && i < lessonItems.length)
+          : []
+      );
+      totalStars = completedIndexes.size * 10;
+      document.getElementById('starsCount').textContent = totalStars;
+      // Kaldığı yerden devam: ilk tamamlanmamış adım
+      const next = lessonItems.findIndex((_, i) => !completedIndexes.has(i));
+      currentIndex = next === -1 ? 0 : next;
+    }
     let isRecording = false;
     let audioContext = null;
     let analyser = null;
@@ -836,6 +867,7 @@
         totalStars += 10;
         starsCount.textContent = totalStars;
         completedIndexes.add(currentIndex);
+        saveProgress();
 
         // Bir sonraki harfe geç veya Bölümü bitir
         setTimeout(() => {
@@ -871,11 +903,15 @@
     function closeCompletionModal() {
       document.getElementById('completionModal').classList.add('hidden');
       completedIndexes.clear();
+      totalStars = 0;
+      document.getElementById('starsCount').textContent = '0';
+      saveProgress();
       currentIndex = 0;
       renderCurrentLetter();
     }
 
     // İlk yükleme
+    loadProgress();
     buildPills();
     renderCurrentLetter();
     Promise.all([loadCurriculum(), loadLetterForms()]).then(() => renderCurrentLetter());

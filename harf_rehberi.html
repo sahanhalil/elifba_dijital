@@ -236,7 +236,37 @@
       reader.readAsText(file);
     }
 
-    build();
+    // Kayıtlı dosyadaki (elle düzeltilmiş) yazılışları getir: kutu boşsa veya
+    // yalnızca otomatik yerleşim (hareke yok) içeriyorsa dosyadaki değer alınır.
+    async function mergeFromFile() {
+      let file = null;
+      try {
+        const res = await fetch('data/harf_yazilislari.json', { cache: 'no-store' });
+        if (res.ok) file = await res.json();
+      } catch (e) { return; }
+      if (!file || typeof file !== 'object' || Array.isArray(file)) return;
+      Object.keys(file).forEach(letter => {
+        const src = file[letter];
+        if (!src || typeof src !== 'object') return;
+        const merge = (group, pos) => {
+          const from = group === 'vowel' ? src[pos] : src[group] && src[group][pos];
+          if (!Array.isArray(from)) return;
+          const cur = bucket(letter, group, pos, false);
+          for (let r = 0; r < 3; r++) {
+            const v = from[r] || '';
+            if (!v) continue;
+            const c = cur && cur[r];
+            if (!c || c === placement(letter, pos)) bucket(letter, group, pos, true)[r] = v;
+          }
+        };
+        POS.forEach(([pos]) => merge('vowel', pos));
+        merge('medd', 'main');
+        merge('tenvin', 'main');
+      });
+      persist();
+    }
+
+    mergeFromFile().then(build);
   </script>
 </body>
 </html>

@@ -762,6 +762,16 @@
         const isQuiz = item.type === 'quiz';
         const card = document.createElement('div');
         card.className = "flex items-center justify-between p-3 rounded-2xl border border-slate-100 bg-slate-50 hover:bg-white transition-all shadow-2xs";
+        card.draggable = true;
+        card.addEventListener("dragstart", e => { e.dataTransfer.setData("text/plain", String(index)); card.classList.add("opacity-50"); });
+        card.addEventListener("dragend", () => card.classList.remove("opacity-50"));
+        card.addEventListener("dragover", e => { e.preventDefault(); card.classList.add("border-sky-400"); });
+        card.addEventListener("dragleave", () => card.classList.remove("border-sky-400"));
+        card.addEventListener("drop", e => {
+          e.preventDefault();
+          const from = parseInt(e.dataTransfer.getData("text/plain"), 10);
+          if (!Number.isNaN(from)) moveWord(from, index);
+        });
         card.innerHTML = `
           <div class="flex items-center gap-3">
             <span class="w-6 h-6 rounded-full bg-slate-200 text-slate-600 text-[10px] font-bold flex items-center justify-center">
@@ -779,6 +789,8 @@
             <span class="text-[9px] font-bold px-2 py-0.5 rounded-full ${isQuiz ? 'bg-amber-100 text-amber-800' : 'bg-sky-100 text-sky-800'}">
               ${isQuiz ? '🏆 Quiz' : '📖 Ders'}
             </span>
+            <button onclick="moveWord(${index}, ${index - 1})" ${index === 0 ? "disabled" : ""} title="Yukarı taşı" class="text-slate-400 hover:text-sky-600 disabled:opacity-30 p-1 text-xs">▲</button>
+            <button onclick="moveWord(${index}, ${index + 1})" ${index === words.length - 1 ? "disabled" : ""} title="Aşağı taşı" class="text-slate-400 hover:text-sky-600 disabled:opacity-30 p-1 text-xs">▼</button>
             <button onclick="deleteWord(${index})" class="text-rose-400 hover:text-rose-600 p-1 text-xs">
               🗑️
             </button>
@@ -786,6 +798,16 @@
         `;
         listContainer.appendChild(card);
       });
+    }
+
+    // Öğeyi from sırasından to sırasına taşır ve kaydeder
+    function moveWord(from, to) {
+      const list = curriculumDB[chapterSelect.value];
+      if (!list || from === to || to < 0 || to >= list.length) return;
+      const [item] = list.splice(from, 1);
+      list.splice(to, 0, item);
+      localStorage.setItem("elifba_curriculum_v2", JSON.stringify(curriculumDB));
+      renderWordsList();
     }
 
     function deleteWord(index) {
